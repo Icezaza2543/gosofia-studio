@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gosofia Commission Calculator</title>
+  <style>
+    :root {
+      --ink: #17121b;
+      --muted: #6f6475;
+      --line: #e6dfe8;
+      --soft: #faf7fb;
+      --panel: #ffffff;
+      --accent: #d9468f;
+      --accent-2: #2f8c8c;
+      --warn: #a05d00;
+      --ok: #1c7a54;
+      --shadow: 0 14px 40px rgba(42, 21, 53, 0.12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255, 247, 252, 0.9), rgba(255, 255, 255, 0.96) 38%),
+        url("https://static.wixstatic.com/media/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png/v1/fill/w_720,h_812,al_c,q_90,enc_avif,quality_auto/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png") right top / min(42vw, 520px) auto no-repeat;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 16px rgba(63, 30, 70, 0.08);
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 2rem);
+      letter-spacing: 0;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .source {
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: 8px;
+      padding: 9px 12px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .primary-link {
+      color: #fff;
+      text-decoration: none;
+      background: var(--accent);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px;
+      margin: 0 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .tab-btn {
+      min-height: 40px;
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 13px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: #fff0f7;
+      color: #9a1d5e;
+      box-shadow: inset 0 0 0 1px rgba(217, 70, 143, 0.24);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .form {
+      padding: 18px;
+    }
+
+    .section {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    label,
+    .label {
+      display: block;
+      margin-bottom: 7px;
+      color: #392f3e;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    select,
+    input[type="number"],
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #d7cddc;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #d7cddc;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(217, 70, 143, 0.14);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .segmented.three {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .option {
+      position: relative;
+      display: block;
+    }
+
+    .option input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option span {
+      display: grid;
+      min-height: 44px;
+      place-items: center;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid #d7cddc;
+      background: #fff;
+      color: #453a4a;
+      padding: 9px 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .option input:checked + span {
+      border-color: var(--accent);
+      background: #fff0f7;
+      color: #9a1d5e;
+    }
+
+    .checks {
+      display: grid;
+      gap: 10px;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid #d7cddc;
+      border-radius: 8px;
+      background: #fff;
+      color: #413647;
+      font-weight: 650;
+    }
+
+    .check input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .total-card {
+      position: sticky;
+      top: 18px;
+      overflow: hidden;
+    }
+
+    .preview {
+      min-height: 180px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.88)),
+        url("https://static.wixstatic.com/media/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png/v1/fill/w_720,h_812,al_c,q_90,enc_avif,quality_auto/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png") center 18% / cover no-repeat;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .total-body {
+      padding: 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0;
+    }
+
+    .price {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(2.2rem, 7vw, 3.8rem);
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 850;
+    }
+
+    .range {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .breakdown {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+
+    .breakdown li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      color: #3b313f;
+      line-height: 1.35;
+    }
+
+    .breakdown strong {
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 44px;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .copy {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .copy:disabled {
+      background: #c7bccd;
+      cursor: not-allowed;
+    }
+
+    .reset {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .summary {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 12px;
+      color: #3f3546;
+      line-height: 1.45;
+      white-space: pre-line;
+      font-size: 0.92rem;
+    }
+
+    .notice {
+      margin: 14px 0 0;
+      color: var(--warn);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .guard {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid #f3c37d;
+      border-radius: 8px;
+      background: #fff8ed;
+      color: #75500b;
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .guard.ok {
+      border-color: #bce3d2;
+      background: #f0fff8;
+      color: var(--ok);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .portfolio-toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+
+    .filter-btn {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      padding: 6px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      border-color: var(--accent);
+      background: #fff0f7;
+      color: #9a1d5e;
+    }
+
+    .portfolio-grid {
+      columns: 4 220px;
+      column-gap: 14px;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .page-panel {
+      padding: 18px;
+    }
+
+    .portfolio-card,
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .portfolio-card {
+      display: inline-block;
+      width: 100%;
+      margin: 0 0 14px;
+      padding: 0;
+      overflow: hidden;
+      text-align: left;
+      cursor: pointer;
+      break-inside: avoid;
+      color: inherit;
+    }
+
+    .portfolio-card.hidden-card {
+      display: none;
+    }
+
+    .portfolio-img {
+      min-height: 220px;
+      background:
+        linear-gradient(140deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.65)),
+        var(--img) center / cover no-repeat;
+    }
+
+    .portfolio-card.tall .portfolio-img {
+      min-height: 360px;
+      background-size: contain;
+      background-color: #fff7fc;
+      background-repeat: no-repeat;
+    }
+
+    .portfolio-card.square .portfolio-img {
+      min-height: 260px;
+    }
+
+    .portfolio-card.wide .portfolio-img {
+      min-height: 170px;
+    }
+
+    .portfolio-card.sensitive .portfolio-img {
+      filter: blur(9px);
+      transform: scale(1.02);
+    }
+
+    .portfolio-card.sensitive .portfolio-img::after {
+      content: "18+ preview";
+      display: grid;
+      place-items: center;
+      min-height: inherit;
+      background: rgba(23, 18, 27, 0.48);
+      color: #fff;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .portfolio-card > div:not(.portfolio-img),
+    .mini-card {
+      padding: 14px;
+    }
+
+    .portfolio-card h3,
+    .mini-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .portfolio-card p,
+    .mini-card p,
+    .policy-list li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .portfolio-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(23, 18, 27, 0.72);
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox-inner {
+      width: min(980px, 100%);
+      max-height: min(88vh, 900px);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .lightbox-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .lightbox-title {
+      margin: 0;
+      font-weight: 850;
+    }
+
+    .lightbox-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 850;
+    }
+
+    .lightbox-img {
+      width: 100%;
+      height: 100%;
+      max-height: calc(88vh - 62px);
+      object-fit: contain;
+      background: var(--soft);
+    }
+
+    .policy-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .policy-list li + li {
+      margin-top: 8px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: #473d4d;
+      font-weight: 750;
+      font-size: 0.82rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 880px) {
+      .page {
+        background:
+          linear-gradient(180deg, rgba(255, 247, 252, 0.95), rgba(255, 255, 255, 0.98) 28%),
+          url("https://static.wixstatic.com/media/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png/v1/fill/w_720,h_812,al_c,q_90,enc_avif,quality_auto/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png") right top / 54vw auto no-repeat;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .content-grid,
+      .wide-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .total-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .wrap {
+        width: min(100% - 20px, 1180px);
+        padding-top: 16px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .segmented.three {
+        grid-template-columns: 1fr;
+      }
+
+      .source {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <div class="mark">G</div>
+          <div>
+            <h1>Gosofia Commission Calculator</h1>
+            <p class="subtitle">แบบฟอร์มประเมินราคาเบื้องต้นสำหรับงานวาด commission</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <a class="source" href="https://gosofiade.wixsite.com/gosofiaartwork" target="_blank" rel="noreferrer">เปิดเว็บเดิม</a>
+          <a class="primary-link" href="#calculator">เริ่มประเมินราคา</a>
+        </div>
+      </header>
+
+      <nav class="tabs" aria-label="เมนูหลัก">
+        <button class="tab-btn active" type="button" data-tab="calculator">Calculator</button>
+        <button class="tab-btn" type="button" data-tab="portfolio">Portfolio</button>
+        <button class="tab-btn" type="button" data-tab="about">About Artist</button>
+        <button class="tab-btn" type="button" data-tab="terms">Terms & Flow</button>
+      </nav>
+
+      <section class="tab-panel active" id="calculator">
+      <main class="shell">
+        <section class="panel form" aria-label="ตัวเลือกราคา">
+          <div class="section">
+            <h2 class="section-title">ข้อมูลโปรเจกต์</h2>
+            <div class="grid">
+              <div class="field">
+                <label for="projectTitle">ชื่องาน / ชื่อตัวละคร</label>
+                <input id="projectTitle" type="text" value="Commission artwork" placeholder="เช่น OC portrait / Vtuber model">
+              </div>
+              <div class="field">
+                <label for="clientName">ชื่อลูกค้า</label>
+                <input id="clientName" type="text" placeholder="ชื่อเล่น / แอคเคานต์">
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">งานหลัก</h2>
+            <div class="grid">
+              <div class="field">
+                <label for="workType">ประเภทงาน</label>
+                <select id="workType">
+                  <option value="headshot">Head Shot</option>
+                  <option value="halfbody">Half Body</option>
+                  <option value="thighup">Thigh Up</option>
+                  <option value="fullbody">Full Body</option>
+                  <option value="pillow">Bolster / Pillowcase</option>
+                  <option value="vtuber">Vtuber Model</option>
+                </select>
+              </div>
+              <div class="field" id="colorField">
+                <span class="label">รูปแบบสี</span>
+                <div class="segmented">
+                  <label class="option">
+                    <input type="radio" name="colorMode" value="bw">
+                    <span>B/W</span>
+                  </label>
+                  <label class="option">
+                    <input type="radio" name="colorMode" value="color" checked>
+                    <span>Full color</span>
+                  </label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="characters">จำนวนตัวละคร</label>
+                <input id="characters" type="number" min="1" max="6" step="1" value="1">
+              </div>
+              <div class="field">
+                <label for="complexity">ดีเทลตัวละคร</label>
+                <select id="complexity">
+                  <option value="simple">เรียบง่าย</option>
+                  <option value="normal" selected>ปกติ</option>
+                  <option value="complex">ละเอียด</option>
+                  <option value="premium">ละเอียดมาก</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">ฉากและสิทธิ์ใช้งาน</h2>
+            <div class="grid">
+              <div class="field">
+                <label for="background">ฉาก</label>
+                <select id="background">
+                  <option value="none">พื้นใส / สีพื้น</option>
+                  <option value="simple">ฉากง่าย</option>
+                  <option value="scene">ฉากมีองค์ประกอบ</option>
+                  <option value="detailed">ฉากละเอียด</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="usage">การนำไปใช้</label>
+                <select id="usage">
+                  <option value="personal">ส่วนตัว</option>
+                  <option value="stream">โปรไฟล์ / สตรีม / โซเชียล</option>
+                  <option value="commercial">เชิงพาณิชย์ / สินค้า</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="deadline">กำหนดส่ง</label>
+                <select id="deadline">
+                  <option value="normal">คิวปกติ</option>
+                  <option value="rush7">เร่ง 7 วัน</option>
+                  <option value="rush3">เร่ง 3 วัน</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="revisions">แก้ใหญ่เพิ่มเติม</label>
+                <select id="revisions">
+                  <option value="0">ไม่มี</option>
+                  <option value="1">1 รอบ</option>
+                  <option value="2">2 รอบ</option>
+                  <option value="3">3 รอบ</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">ตัวเลือกเสริม</h2>
+            <div class="grid">
+              <div class="checks">
+                <label class="check">
+                  <input id="live2d" type="checkbox">
+                  <span>แยกพาร์ตสำหรับ Live2D <span class="muted">(+50%)</span></span>
+                </label>
+                <label class="check">
+                  <input id="sourceFile" type="checkbox">
+                  <span>ไฟล์ PSD / source file <span class="muted">(+300)</span></span>
+                </label>
+                <label class="check">
+                  <input id="nsfw" type="checkbox">
+                  <span>R-18 / โทนเซ็กซี่ <span class="muted">(+20%)</span></span>
+                </label>
+                <label class="check" id="adultCheckRow">
+                  <input id="adultOnly" type="checkbox">
+                  <span>ยืนยันว่าตัวละครทุกตัวเป็น 18+ และไม่ใช้ภาพลักษณ์เด็ก</span>
+                </label>
+              </div>
+              <div class="checks" id="vtuberOptions">
+                <label class="check">
+                  <input id="extraOutfit" type="checkbox">
+                  <span>ชุดเพิ่มสำหรับโมเดล <span class="muted">(+500)</span></span>
+                </label>
+                <label class="check">
+                  <input id="extraHair" type="checkbox">
+                  <span>ทรงผม / ส่วนร่างกายเพิ่ม <span class="muted">(+1,000)</span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">ไทม์ไลน์และการชำระเงิน</h2>
+            <div class="grid">
+              <div class="field">
+                <label for="acceptDate">รับงาน</label>
+                <input id="acceptDate" type="date">
+              </div>
+              <div class="field">
+                <label for="sketchStartDate">เริ่มร่าง</label>
+                <input id="sketchStartDate" type="date">
+              </div>
+              <div class="field">
+                <label for="sketchDueDate">ส่งร่างภายใน</label>
+                <input id="sketchDueDate" type="date">
+              </div>
+              <div class="field">
+                <label for="finalDueDate">ส่งงานเสร็จภายใน</label>
+                <input id="finalDueDate" type="date">
+              </div>
+              <div class="field">
+                <label for="deposit">มัดจำขั้นต่ำ</label>
+                <input id="deposit" type="number" min="0" step="100" value="500">
+              </div>
+              <div class="field">
+                <label for="paymentMode">วิธีจ่ายที่แสดงในบรีฟ</label>
+                <select id="paymentMode">
+                  <option value="both">มัดจำ หรือ เต็มจำนวน</option>
+                  <option value="deposit">มัดจำก่อน</option>
+                  <option value="full">เต็มจำนวน</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">บรีฟย่อ</h2>
+            <textarea id="notes" placeholder="สรุปรายละเอียดท่าทาง เสื้อผ้า mood ฉาก และข้อห้ามของงาน"></textarea>
+            <div class="guard" id="policyGuard">ระบบนี้ใช้ประเมินราคาเบื้องต้น งาน NSFW ต้องเป็นตัวละครผู้ใหญ่ 18+ เท่านั้น</div>
+          </div>
+        </section>
+
+        <aside class="panel total-card" aria-label="ราคารวม">
+          <div class="preview"></div>
+          <div class="total-body">
+            <p class="eyebrow">ราคารวมโดยประมาณ</p>
+            <p class="price" id="total">฿0</p>
+            <p class="range" id="range">ช่วงประเมินจะเปลี่ยนตามตัวเลือก</p>
+            <ul class="breakdown" id="breakdown"></ul>
+            <div class="actions">
+              <button class="copy" id="copyBtn" type="button">คัดลอกบรีฟ</button>
+              <button class="reset" id="resetBtn" type="button" title="รีเซ็ต">↺</button>
+            </div>
+            <div class="summary" id="summary"></div>
+            <p class="notice">ราคานี้เป็นราคาเริ่มต้นสำหรับคัดกรอง requirement ก่อนคุยรายละเอียดจริง</p>
+          </div>
+        </aside>
+      </main>
+      </section>
+
+      <section class="tab-panel" id="portfolio">
+        <div class="panel page-panel">
+          <h2 class="section-title">Portfolio</h2>
+          <div class="portfolio-toolbar" aria-label="กรอง portfolio">
+            <button class="filter-btn active" type="button" data-filter="all">ทั้งหมด</button>
+            <button class="filter-btn" type="button" data-filter="character">Character</button>
+            <button class="filter-btn" type="button" data-filter="vtuber">Vtuber</button>
+            <button class="filter-btn" type="button" data-filter="merch">Merch</button>
+            <button class="filter-btn" type="button" data-filter="style">Style Sheet</button>
+            <button class="filter-btn" type="button" data-filter="adult">18+</button>
+          </div>
+
+          <div class="portfolio-grid">
+            <button class="portfolio-card wide" type="button" data-category="style" data-title="Cover Artwork" data-full="https://static.wixstatic.com/media/77af18_7fe4c232bc3d4fce9215949d6f3325b6~mv2.jpg">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_7fe4c232bc3d4fce9215949d6f3325b6~mv2.jpg')"></div>
+              <div>
+                <h3>Cover Artwork</h3>
+                <p>ภาพเปิดหน้าเว็บเดิม ใช้เป็นตัวอย่างโทนและ mood ของแบรนด์</p>
+                <div class="portfolio-meta"><span>Style</span><span>Original site</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="character" data-title="Head Shot Sample" data-full="https://static.wixstatic.com/media/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_94c21b3931a9425a846f892376c9a85b~mv2.png')"></div>
+              <div>
+                <h3>Head Shot Sample</h3>
+                <p>ตัวอย่างงานหัว-ไหล่ ใช้คุม mood, หน้าตา และรายละเอียดใบหน้า</p>
+                <div class="portfolio-meta"><span>Character</span><span>Head Shot</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="character" data-title="Khione Twintail" data-full="https://static.wixstatic.com/media/77af18_4456c6a158254fcd84924c2b7fab9ff5~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_4456c6a158254fcd84924c2b7fab9ff5~mv2.png')"></div>
+              <div>
+                <h3>Khione Twintail</h3>
+                <p>ตัวอย่างตัวละครช่วงบน เหมาะกับงาน character sheet และ profile</p>
+                <div class="portfolio-meta"><span>Character</span><span>Half Body</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="character" data-title="Thigh Up Sample" data-full="https://static.wixstatic.com/media/77af18_4becf62d34354e49a9d4b41b6dc62463~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_4becf62d34354e49a9d4b41b6dc62463~mv2.png')"></div>
+              <div>
+                <h3>Thigh Up Sample</h3>
+                <p>ตัวอย่างงานครึ่งตัวล่าง เห็นชุดและ silhouette ชัดขึ้น</p>
+                <div class="portfolio-meta"><span>Character</span><span>Thigh Up</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card square" type="button" data-category="vtuber" data-title="Vtuber Model Preview" data-full="https://static.wixstatic.com/media/77af18_81269c32078649b1b7d89b8c1177263e~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_81269c32078649b1b7d89b8c1177263e~mv2.png')"></div>
+              <div>
+                <h3>Vtuber Model Preview</h3>
+                <p>งานโมเดลและดีไซน์สำหรับต่อยอดเป็น Live2D หรือ stream asset</p>
+                <div class="portfolio-meta"><span>Vtuber</span><span>Model</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card wide" type="button" data-category="vtuber" data-title="Vtuber Parts" data-full="https://static.wixstatic.com/media/77af18_c0ab08a8cf874b79ab3bfab0008b55c8~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_c0ab08a8cf874b79ab3bfab0008b55c8~mv2.png')"></div>
+              <div>
+                <h3>Vtuber Parts</h3>
+                <p>ตัวอย่างชิ้นส่วน / รายละเอียดสำหรับประเมินงานโมเดล</p>
+                <div class="portfolio-meta"><span>Vtuber</span><span>Parts</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card wide" type="button" data-category="merch" data-title="Pillowcase Layout" data-full="https://static.wixstatic.com/media/77af18_ea8c3a7d18394e5dbdd01ebd49a2f27d~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_ea8c3a7d18394e5dbdd01ebd49a2f27d~mv2.png')"></div>
+              <div>
+                <h3>Pillowcase Layout</h3>
+                <p>ตัวอย่างงานสำหรับ merchandise / print-ready layout</p>
+                <div class="portfolio-meta"><span>Merch</span><span>Pillowcase</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="merch" data-title="Merch Character A" data-full="https://static.wixstatic.com/media/77af18_c4d9acdcbf114476ba7dc5df0d4bdb64~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_c4d9acdcbf114476ba7dc5df0d4bdb64~mv2.png')"></div>
+              <div>
+                <h3>Merch Character A</h3>
+                <p>ตัวอย่าง character asset จากหน้า merch เดิม</p>
+                <div class="portfolio-meta"><span>Merch</span><span>Asset</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="merch" data-title="Merch Character B" data-full="https://static.wixstatic.com/media/77af18_169f13ea4fef42a5a8edf979acfea200~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_169f13ea4fef42a5a8edf979acfea200~mv2.png')"></div>
+              <div>
+                <h3>Merch Character B</h3>
+                <p>ตัวอย่าง asset สำหรับแสดง variation ใน portfolio</p>
+                <div class="portfolio-meta"><span>Merch</span><span>Asset</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="merch" data-title="Merch Character C" data-full="https://static.wixstatic.com/media/77af18_b72b90a2d5b94318b3c5813bd2962063~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_b72b90a2d5b94318b3c5813bd2962063~mv2.png')"></div>
+              <div>
+                <h3>Merch Character C</h3>
+                <p>ตัวอย่างงานตัวละครสำหรับสินค้าและคอลเลกชัน</p>
+                <div class="portfolio-meta"><span>Merch</span><span>Asset</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall" type="button" data-category="style" data-title="Rate Card Art" data-full="https://static.wixstatic.com/media/77af18_cf5a1da3626c4c8798fa8a432450ab15~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_cf5a1da3626c4c8798fa8a432450ab15~mv2.png')"></div>
+              <div>
+                <h3>Rate Card Art</h3>
+                <p>ภาพประกอบจากหน้าเรตราคา ใช้เป็นตัวอย่างสเกลงาน</p>
+                <div class="portfolio-meta"><span>Style Sheet</span><span>Rate</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall sensitive" type="button" data-category="adult" data-sensitive="true" data-title="Adult Style Preview" data-full="https://static.wixstatic.com/media/77af18_162636b175c54e999600c426eda17965~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_162636b175c54e999600c426eda17965~mv2.png')"></div>
+              <div>
+                <h3>Adult Style Preview</h3>
+                <p>ตัวอย่างโทน 18+ จากเว็บเดิม แสดงแบบเบลอใน portfolio</p>
+                <div class="portfolio-meta"><span>18+ only</span><span>Blurred</span></div>
+              </div>
+            </button>
+
+            <button class="portfolio-card tall sensitive" type="button" data-category="adult" data-sensitive="true" data-title="Adult Long Preview" data-full="https://static.wixstatic.com/media/77af18_43a5c583b7fe4ba7bdf3fc4e112dea29~mv2.png">
+              <div class="portfolio-img" style="--img:url('https://static.wixstatic.com/media/77af18_43a5c583b7fe4ba7bdf3fc4e112dea29~mv2.png')"></div>
+              <div>
+                <h3>Adult Long Preview</h3>
+                <p>ตัวอย่างสเกลงาน 18+ จากหน้าเดิม เบลอไว้จนกว่าจะเปิดดู</p>
+                <div class="portfolio-meta"><span>18+ only</span><span>Blurred</span></div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="about">
+        <div class="wide-grid">
+          <div class="panel page-panel">
+            <h2 class="section-title">About Artist</h2>
+            <p class="range">Gosofia เป็นนักวาดสาย character-focused ที่เน้นความน่ารัก รายละเอียดชุด และ mood ของตัวละคร เหมาะกับ commission ที่มีบรีฟชัดและต้องการคุย scope ก่อนเริ่มงาน</p>
+            <div class="badges">
+              <span class="badge">Character Art</span>
+              <span class="badge">Vtuber Model</span>
+              <span class="badge">Merch Art</span>
+              <span class="badge">NSFW 18+ only</span>
+            </div>
+          </div>
+          <div class="panel page-panel">
+            <h2 class="section-title">Working Style</h2>
+            <div class="content-grid">
+              <div class="mini-card">
+                <h3>1. Scope</h3>
+                <p>เลือกรูปแบบงาน จำนวนตัวละคร ฉาก และสิทธิ์ใช้งานให้ชัดก่อนประเมินราคา</p>
+              </div>
+              <div class="mini-card">
+                <h3>2. Sketch</h3>
+                <p>ส่งร่างตามวันที่ตกลง ลูกค้าแก้รอบใหญ่ตามจำนวนที่ระบุในบรีฟ</p>
+              </div>
+              <div class="mini-card">
+                <h3>3. Delivery</h3>
+                <p>ส่งไฟล์ตาม scope งาน หากต้องการ source file หรือแยกพาร์ตให้เลือกตั้งแต่ต้น</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="terms">
+        <div class="wide-grid">
+          <div class="panel page-panel">
+            <h2 class="section-title">Terms & Flow</h2>
+            <ol class="policy-list">
+              <li>ราคาที่เว็บคำนวณเป็นราคาเริ่มต้น ใช้สำหรับคัดกรอง requirement ก่อนตกลงงานจริง</li>
+              <li>เริ่มงานหลังยืนยัน scope และชำระเงินตามเงื่อนไขที่ตกลง</li>
+              <li>แก้ใหญ่เพิ่มเติมคิดเพิ่มตามจำนวนรอบที่เลือก ส่วนแก้เล็กน้อยในขั้นตอนร่างขึ้นกับข้อตกลง</li>
+              <li>สิทธิ์เชิงพาณิชย์ต้องเลือกในระบบก่อนใช้งานกับสินค้า โปรโมชัน หรือรายได้โดยตรง</li>
+            </ol>
+          </div>
+          <div class="panel page-panel">
+            <h2 class="section-title">Content Policy</h2>
+            <ul class="policy-list">
+              <li>งาน NSFW รับเฉพาะตัวละครและผู้เกี่ยวข้องที่เป็นผู้ใหญ่ 18+ เท่านั้น</li>
+              <li>ไม่รับงาน sexual ที่ทำให้ดูเป็นเด็ก นักเรียน หรือมีลักษณะ minor-coded</li>
+              <li>ไม่รับงาน non-consensual, hate, หรือเนื้อหาที่ละเมิดสิทธิ์ผู้อื่น</li>
+              <li>ถ้าบรีฟมีความคลุมเครือ ศิลปินสามารถขอแก้ scope หรือปฏิเสธงานได้</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="lightbox" id="portfolioLightbox" aria-hidden="true">
+        <div class="lightbox-inner" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+          <div class="lightbox-head">
+            <p class="lightbox-title" id="lightboxTitle">Portfolio preview</p>
+            <button class="lightbox-close" id="lightboxClose" type="button" aria-label="ปิด">×</button>
+          </div>
+          <img class="lightbox-img" id="lightboxImg" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PRICING = {
+      base: {
+        headshot: { label: "Head Shot", bw: 350, color: 450 },
+        halfbody: { label: "Half Body", bw: 600, color: 750 },
+        thighup: { label: "Thigh Up", bw: 700, color: 900 },
+        fullbody: { label: "Full Body", bw: 950, color: 1200 },
+        pillow: { label: "Bolster / Pillowcase", color: 2000 },
+        vtuber: { label: "Vtuber Model", color: 4000 },
+      },
+      complexity: {
+        simple: { label: "เรียบง่าย", multiplier: 0 },
+        normal: { label: "ปกติ", multiplier: 0 },
+        complex: { label: "ละเอียด", multiplier: 0.25 },
+        premium: { label: "ละเอียดมาก", multiplier: 0.4 },
+      },
+      background: {
+        none: { label: "พื้นใส / สีพื้น", amount: 0 },
+        simple: { label: "ฉากง่าย", amount: 0 },
+        scene: { label: "ฉากมีองค์ประกอบ", amount: 300 },
+        detailed: { label: "ฉากละเอียด", amount: 700 },
+      },
+      usage: {
+        personal: { label: "ส่วนตัว", multiplier: 1 },
+        stream: { label: "โปรไฟล์ / สตรีม / โซเชียล", multiplier: 1.3 },
+        commercial: { label: "เชิงพาณิชย์ / สินค้า", multiplier: 2 },
+      },
+      deadline: {
+        normal: { label: "คิวปกติ", multiplier: 0 },
+        rush7: { label: "เร่ง 7 วัน", multiplier: 0.3 },
+        rush3: { label: "เร่ง 3 วัน", multiplier: 0.6 },
+      },
+    };
+
+    const el = {
+      tabs: document.querySelectorAll(".tab-btn"),
+      panels: document.querySelectorAll(".tab-panel"),
+      filterButtons: document.querySelectorAll(".filter-btn"),
+      portfolioCards: document.querySelectorAll(".portfolio-card"),
+      lightbox: document.querySelector("#portfolioLightbox"),
+      lightboxTitle: document.querySelector("#lightboxTitle"),
+      lightboxImg: document.querySelector("#lightboxImg"),
+      lightboxClose: document.querySelector("#lightboxClose"),
+      projectTitle: document.querySelector("#projectTitle"),
+      clientName: document.querySelector("#clientName"),
+      workType: document.querySelector("#workType"),
+      colorField: document.querySelector("#colorField"),
+      characters: document.querySelector("#characters"),
+      complexity: document.querySelector("#complexity"),
+      background: document.querySelector("#background"),
+      usage: document.querySelector("#usage"),
+      deadline: document.querySelector("#deadline"),
+      revisions: document.querySelector("#revisions"),
+      live2d: document.querySelector("#live2d"),
+      sourceFile: document.querySelector("#sourceFile"),
+      nsfw: document.querySelector("#nsfw"),
+      adultOnly: document.querySelector("#adultOnly"),
+      adultCheckRow: document.querySelector("#adultCheckRow"),
+      extraOutfit: document.querySelector("#extraOutfit"),
+      extraHair: document.querySelector("#extraHair"),
+      vtuberOptions: document.querySelector("#vtuberOptions"),
+      acceptDate: document.querySelector("#acceptDate"),
+      sketchStartDate: document.querySelector("#sketchStartDate"),
+      sketchDueDate: document.querySelector("#sketchDueDate"),
+      finalDueDate: document.querySelector("#finalDueDate"),
+      deposit: document.querySelector("#deposit"),
+      paymentMode: document.querySelector("#paymentMode"),
+      notes: document.querySelector("#notes"),
+      policyGuard: document.querySelector("#policyGuard"),
+      total: document.querySelector("#total"),
+      range: document.querySelector("#range"),
+      breakdown: document.querySelector("#breakdown"),
+      summary: document.querySelector("#summary"),
+      copyBtn: document.querySelector("#copyBtn"),
+      resetBtn: document.querySelector("#resetBtn"),
+    };
+
+    const money = new Intl.NumberFormat("th-TH", {
+      style: "currency",
+      currency: "THB",
+      maximumFractionDigits: 0,
+    });
+
+    const dateText = new Intl.DateTimeFormat("th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    function selectedColor() {
+      return document.querySelector("input[name='colorMode']:checked").value;
+    }
+
+    function setColor(value) {
+      document.querySelector(`input[name='colorMode'][value="${value}"]`).checked = true;
+    }
+
+    function isoDate(daysFromToday) {
+      const date = new Date();
+      date.setDate(date.getDate() + daysFromToday);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function prettyDate(value) {
+      if (!value) return "-";
+      return dateText.format(new Date(value + "T00:00:00"));
+    }
+
+    function initDates() {
+      el.acceptDate.value = isoDate(0);
+      el.sketchStartDate.value = isoDate(4);
+      el.sketchDueDate.value = isoDate(6);
+      el.finalDueDate.value = isoDate(14);
+    }
+
+    function calculate() {
+      const type = el.workType.value;
+      const item = PRICING.base[type];
+      const isFixedColor = type === "pillow" || type === "vtuber";
+      const color = isFixedColor ? "color" : selectedColor();
+      const base = item[color] || item.color;
+      const characters = Math.max(1, Math.min(6, Number(el.characters.value || 1)));
+      const extraCharacters = characters - 1;
+      const characterFee = extraCharacters * Math.round(base * 0.7);
+      const complexity = PRICING.complexity[el.complexity.value];
+      const complexityFee = Math.round((base + characterFee) * complexity.multiplier);
+      const background = PRICING.background[el.background.value];
+      const baseBeforeMultipliers = base + characterFee + complexityFee + background.amount;
+      const live2dFee = el.live2d.checked && type !== "vtuber" ? Math.round(baseBeforeMultipliers * 0.5) : 0;
+      const sourceFee = el.sourceFile.checked ? 300 : 0;
+      const nsfwFee = el.nsfw.checked ? Math.round(baseBeforeMultipliers * 0.2) : 0;
+      const outfitFee = type === "vtuber" && el.extraOutfit.checked ? 500 : 0;
+      const hairFee = type === "vtuber" && el.extraHair.checked ? 1000 : 0;
+      const revisionsFee = Number(el.revisions.value || 0) * 200;
+      const usage = PRICING.usage[el.usage.value];
+      const deadline = PRICING.deadline[el.deadline.value];
+      const subtotal = baseBeforeMultipliers + live2dFee + sourceFee + nsfwFee + outfitFee + hairFee + revisionsFee;
+      const usageFee = Math.round(subtotal * (usage.multiplier - 1));
+      const rushFee = Math.round((subtotal + usageFee) * deadline.multiplier);
+      const total = subtotal + usageFee + rushFee;
+      const low = Math.max(0, Math.round(total * 0.9 / 10) * 10);
+      const high = Math.round(total * 1.15 / 10) * 10;
+      const deposit = Math.min(total, Math.max(0, Number(el.deposit.value || 0)));
+      const balance = Math.max(0, total - deposit);
+
+      return {
+        projectTitle: el.projectTitle.value.trim() || "Commission artwork",
+        clientName: el.clientName.value.trim() || "-",
+        type,
+        label: item.label,
+        color,
+        colorLabel: color === "bw" ? "B/W" : "Full color",
+        characters,
+        base,
+        characterFee,
+        complexity,
+        complexityFee,
+        background,
+        live2dFee,
+        sourceFee,
+        nsfwFee,
+        outfitFee,
+        hairFee,
+        revisionsFee,
+        usage,
+        usageFee,
+        deadline,
+        rushFee,
+        total,
+        low,
+        high,
+        deposit,
+        balance,
+        paymentMode: el.paymentMode.value,
+        dates: {
+          accept: el.acceptDate.value,
+          sketchStart: el.sketchStartDate.value,
+          sketchDue: el.sketchDueDate.value,
+          finalDue: el.finalDueDate.value,
+        },
+      };
+    }
+
+    function line(label, value) {
+      if (!value) return "";
+      return `<li><span>${label}</span><strong>${money.format(value)}</strong></li>`;
+    }
+
+    function render() {
+      const quote = calculate();
+      const isFixedColor = quote.type === "pillow" || quote.type === "vtuber";
+      el.colorField.classList.toggle("hidden", isFixedColor);
+      el.vtuberOptions.classList.toggle("hidden", quote.type !== "vtuber");
+      el.adultCheckRow.classList.toggle("hidden", !el.nsfw.checked);
+      el.live2d.disabled = quote.type === "vtuber";
+      if (isFixedColor) setColor("color");
+      if (quote.type === "vtuber") el.live2d.checked = false;
+      if (!el.nsfw.checked) el.adultOnly.checked = false;
+
+      const blockedByPolicy = el.nsfw.checked && !el.adultOnly.checked;
+      el.copyBtn.disabled = blockedByPolicy;
+      el.policyGuard.classList.toggle("ok", !blockedByPolicy);
+      el.policyGuard.textContent = blockedByPolicy
+        ? "งาน NSFW ต้องยืนยันว่าตัวละครทุกตัวเป็นผู้ใหญ่ 18+ ก่อนคัดลอก final brief"
+        : "ระบบนี้ใช้ประเมินราคาเบื้องต้น งาน NSFW ต้องเป็นตัวละครผู้ใหญ่ 18+ เท่านั้น";
+
+      el.total.textContent = money.format(quote.total);
+      el.range.textContent = `${money.format(quote.low)} - ${money.format(quote.high)} หลังดูบรีฟจริง`;
+      el.breakdown.innerHTML = [
+        line(`${quote.label} / ${quote.colorLabel}`, quote.base),
+        line(`ตัวละครเพิ่ม x ${quote.characters - 1}`, quote.characterFee),
+        line(`ดีเทล ${quote.complexity.label}`, quote.complexityFee),
+        line(quote.background.label, quote.background.amount),
+        line("แยกพาร์ต Live2D", quote.live2dFee),
+        line("ไฟล์ PSD / source file", quote.sourceFee),
+        line("R-18 / NSFW 18+ only", quote.nsfwFee),
+        line("ชุดเพิ่มสำหรับโมเดล", quote.outfitFee),
+        line("ทรงผม / ส่วนร่างกายเพิ่ม", quote.hairFee),
+        line("แก้ใหญ่เพิ่มเติม", quote.revisionsFee),
+        line(`สิทธิ์ใช้งาน: ${quote.usage.label}`, quote.usageFee),
+        line(`กำหนดส่ง: ${quote.deadline.label}`, quote.rushFee),
+      ].join("");
+
+      el.summary.textContent = buildSummary(quote);
+    }
+
+    function buildSummary(quote) {
+      const notes = el.notes.value.trim();
+      const priceLines = [
+        `${quote.label} / ${quote.colorLabel}: ${money.format(quote.base)}`,
+        quote.characterFee ? `ตัวละครเพิ่ม x ${quote.characters - 1}: ${money.format(quote.characterFee)}` : "",
+        quote.complexityFee ? `ดีเทล ${quote.complexity.label}: ${money.format(quote.complexityFee)}` : "",
+        quote.background.amount ? `ฉาก: ${money.format(quote.background.amount)}` : "",
+        quote.live2dFee ? `แยกพาร์ต Live2D: ${money.format(quote.live2dFee)}` : "",
+        quote.sourceFee ? `ไฟล์ PSD / source file: ${money.format(quote.sourceFee)}` : "",
+        quote.nsfwFee ? `NSFW 18+ only: ${money.format(quote.nsfwFee)}` : "",
+        quote.outfitFee ? `ชุดเพิ่มสำหรับโมเดล: ${money.format(quote.outfitFee)}` : "",
+        quote.hairFee ? `ทรงผม / ส่วนร่างกายเพิ่ม: ${money.format(quote.hairFee)}` : "",
+        quote.revisionsFee ? `แก้ใหญ่เพิ่มเติม: ${money.format(quote.revisionsFee)}` : "",
+        quote.usageFee ? `สิทธิ์ใช้งาน ${quote.usage.label}: ${money.format(quote.usageFee)}` : "",
+        quote.rushFee ? `กำหนดส่ง ${quote.deadline.label}: ${money.format(quote.rushFee)}` : "",
+      ].filter(Boolean);
+
+      const paymentText = {
+        both: [
+          `1. ชำระมัดจำ ${money.format(quote.deposit)} และชำระส่วนที่เหลือ ${money.format(quote.balance)} เมื่อภาพร่างผ่าน`,
+          "หรือ",
+          `2. ชำระเต็มจำนวน ${money.format(quote.total)} ได้เลยหากสะดวก`,
+        ],
+        deposit: [
+          `ชำระมัดจำ ${money.format(quote.deposit)} ก่อนเริ่มงาน`,
+          `ชำระส่วนที่เหลือ ${money.format(quote.balance)} เมื่อภาพร่างผ่าน`,
+        ],
+        full: [`ชำระเต็มจำนวน ${money.format(quote.total)} ก่อนเริ่มงาน`],
+      }[quote.paymentMode];
+
+      return [
+        `สรุปบรีฟ ${quote.projectTitle}`,
+        "",
+        `ลูกค้า: ${quote.clientName}`,
+        `ประเภทงาน: ${quote.label}`,
+        `จำนวนตัวละคร: ${quote.characters}`,
+        `สี: ${quote.colorLabel}`,
+        `ดีเทล: ${quote.complexity.label}`,
+        `ฉาก: ${quote.background.label}`,
+        `การใช้งาน: ${quote.usage.label}`,
+        `กำหนดส่ง: ${quote.deadline.label}`,
+        el.nsfw.checked ? "หมายเหตุ NSFW: ยืนยันเฉพาะตัวละครผู้ใหญ่ 18+ เท่านั้น" : "",
+        notes ? `รายละเอียดบรีฟ: ${notes}` : "รายละเอียดบรีฟ: -",
+        "",
+        "------------------",
+        "จากบรีฟ / ราคาแยก",
+        ...priceLines.map((item) => `- ${item}`),
+        "",
+        "------------------",
+        "สรุปราคา",
+        `รวมทั้งหมด = ${money.format(quote.total)}`,
+        `ช่วงประเมินหลังดูบรีฟจริง = ${money.format(quote.low)} - ${money.format(quote.high)}`,
+        "",
+        "------------------",
+        "ระยะเวลาทำงาน",
+        `รับงาน: ${prettyDate(quote.dates.accept)}`,
+        `เริ่มร่าง: ${prettyDate(quote.dates.sketchStart)}`,
+        `ส่งร่างภายใน: ${prettyDate(quote.dates.sketchDue)}`,
+        `ส่งงานที่เสร็จภายใน: ${prettyDate(quote.dates.finalDue)}`,
+        "",
+        "------------------",
+        "การชำระเงิน",
+        ...paymentText,
+        "จะอัปเดตงานให้เรื่อย ๆ เมื่อผ่านแต่ละขั้นตอน",
+      ].filter((line) => line !== null && line !== undefined).join("\n");
+    }
+
+    function resetForm() {
+      el.projectTitle.value = "Commission artwork";
+      el.clientName.value = "";
+      el.workType.value = "headshot";
+      setColor("color");
+      el.characters.value = 1;
+      el.complexity.value = "normal";
+      el.background.value = "none";
+      el.usage.value = "personal";
+      el.deadline.value = "normal";
+      el.revisions.value = "0";
+      el.live2d.checked = false;
+      el.sourceFile.checked = false;
+      el.nsfw.checked = false;
+      el.adultOnly.checked = false;
+      el.extraOutfit.checked = false;
+      el.extraHair.checked = false;
+      el.deposit.value = 500;
+      el.paymentMode.value = "both";
+      initDates();
+      el.notes.value = "";
+      render();
+    }
+
+    function activateTab(tabId) {
+      el.tabs.forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tabId);
+      });
+      el.panels.forEach((panel) => {
+        panel.classList.toggle("active", panel.id === tabId);
+      });
+      if (tabId) history.replaceState(null, "", `#${tabId}`);
+    }
+
+    function filterPortfolio(category) {
+      el.filterButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.filter === category);
+      });
+      el.portfolioCards.forEach((card) => {
+        const show = category === "all" || card.dataset.category === category;
+        card.classList.toggle("hidden-card", !show);
+      });
+    }
+
+    function openLightbox(card) {
+      if (card.dataset.sensitive === "true") {
+        const ok = window.confirm("ภาพนี้เป็นหมวด 18+ ยืนยันว่าเปิดดูตัวอย่างสำหรับผู้ใหญ่เท่านั้น");
+        if (!ok) return;
+      }
+
+      el.lightboxTitle.textContent = card.dataset.title || "Portfolio preview";
+      el.lightboxImg.src = card.dataset.full;
+      el.lightboxImg.alt = card.dataset.title || "Portfolio preview";
+      el.lightbox.classList.add("open");
+      el.lightbox.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLightbox() {
+      el.lightbox.classList.remove("open");
+      el.lightbox.setAttribute("aria-hidden", "true");
+      el.lightboxImg.removeAttribute("src");
+    }
+
+    document.querySelectorAll("select, input, textarea").forEach((node) => {
+      node.addEventListener("input", render);
+      node.addEventListener("change", render);
+    });
+
+    el.tabs.forEach((button) => {
+      button.addEventListener("click", () => activateTab(button.dataset.tab));
+    });
+
+    el.filterButtons.forEach((button) => {
+      button.addEventListener("click", () => filterPortfolio(button.dataset.filter));
+    });
+
+    el.portfolioCards.forEach((card) => {
+      card.addEventListener("click", () => openLightbox(card));
+    });
+
+    el.lightboxClose.addEventListener("click", closeLightbox);
+    el.lightbox.addEventListener("click", (event) => {
+      if (event.target === el.lightbox) closeLightbox();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && el.lightbox.classList.contains("open")) closeLightbox();
+    });
+
+    window.addEventListener("hashchange", () => {
+      const nextTab = location.hash.replace("#", "");
+      if (nextTab && document.getElementById(nextTab)) activateTab(nextTab);
+    });
+
+    el.copyBtn.addEventListener("click", async () => {
+      if (el.copyBtn.disabled) return;
+      await navigator.clipboard.writeText(el.summary.textContent);
+      el.copyBtn.textContent = "คัดลอกแล้ว";
+      window.setTimeout(() => {
+        el.copyBtn.textContent = "คัดลอกบรีฟ";
+      }, 1200);
+    });
+
+    el.resetBtn.addEventListener("click", resetForm);
+    initDates();
+    if (location.hash && document.querySelector(location.hash)) {
+      activateTab(location.hash.slice(1));
+    }
+    render();
+  </script>
+</body>
+</html>
