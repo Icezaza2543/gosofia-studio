@@ -10,9 +10,13 @@ const currentPath = Astro.url.pathname;
     <div class="flex items-center justify-between h-16">
       <!-- Brand -->
       <a href="/" class="flex items-center gap-3 group" id="site-logo">
-        <div class="w-10 h-10 rounded-lg bg-primary text-white font-extrabold text-lg grid place-items-center shadow-md group-hover:scale-105 transition-transform">
-          G
-        </div>
+        <img
+          src="/images/brand/logo-gosofia.png"
+          alt="Gosofia"
+          width="40"
+          height="40"
+          class="w-10 h-10 rounded-lg bg-white object-contain shadow-md group-hover:scale-105 transition-transform"
+        />
         <div class="hidden sm:block">
           <span class="text-lg font-bold text-primary">{artist.name}</span>
           {artist.commissionStatus === 'open' && (
@@ -46,18 +50,25 @@ const currentPath = Astro.url.pathname;
         </div>
       </nav>
 
-      <!-- Mobile Menu Button -->
-      <button
-        type="button"
-        id="mobile-menu-btn"
-        class="lg:hidden w-10 h-10 rounded-lg border border-line bg-white grid place-items-center text-muted hover:text-primary transition-colors"
-        aria-label="เปิดเมนู"
-        aria-expanded="false"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M3 6h18M3 12h18M3 18h18" />
-        </svg>
-      </button>
+      <div class="lg:hidden flex items-center gap-2">
+        <div class="flex items-center bg-secondary-light rounded-lg p-1">
+          <button type="button" class="lang-btn px-2.5 py-1 rounded-md text-xs font-bold transition-colors bg-white text-primary shadow-sm" data-lang="th">TH</button>
+          <button type="button" class="lang-btn px-2.5 py-1 rounded-md text-xs font-bold transition-colors text-muted hover:text-primary" data-lang="en">EN</button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button
+          type="button"
+          id="mobile-menu-btn"
+          class="w-10 h-10 rounded-lg border border-line bg-white grid place-items-center text-muted hover:text-primary transition-colors"
+          aria-label="เปิดเมนู"
+          aria-expanded="false"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -83,10 +94,6 @@ const currentPath = Astro.url.pathname;
           {item.label}
         </a>
       ))}
-      <div class="mt-2 pt-2 border-t border-line flex items-center gap-2">
-        <button type="button" class="lang-btn flex-1 py-2 rounded-lg text-sm font-bold transition-colors bg-secondary text-primary border border-primary/20" data-lang="th">TH</button>
-        <button type="button" class="lang-btn flex-1 py-2 rounded-lg text-sm font-bold transition-colors bg-white text-muted border border-line" data-lang="en">EN</button>
-      </div>
     </div>
   </nav>
 </header>

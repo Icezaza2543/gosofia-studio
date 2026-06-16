@@ -7,9 +7,11 @@ interface Props {
   sfwOnly?: boolean;
   /** Limit the number of items shown */
   limit?: number;
+  /** Use fixed responsive grid layout for homepage featured items */
+  featured?: boolean;
 }
 
-const { sfwOnly = false, limit } = Astro.props;
+const { sfwOnly = false, limit, featured = false } = Astro.props;
 
 let items: PortfolioItem[] = sfwOnly
   ? portfolio.filter((item) => !item.isAdult && item.canShow)
@@ -42,9 +44,23 @@ const showFilters = !sfwOnly;
   </div>
 )}
 
-<div class="columns-1 sm:columns-2 lg:columns-3 gap-4" id="portfolio-grid">
+<div
+  class:list={[
+    featured
+      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 [&_.portfolio-card]:mb-0'
+      : 'columns-1 sm:columns-2 lg:columns-3 gap-4 [&_.portfolio-card]:mb-0',
+  ]}
+  id="portfolio-grid"
+>
   {items.map((item) => (
-    <div class="portfolio-item" data-categories={JSON.stringify(item.category)} data-is-adult={item.isAdult.toString()}>
+    <div
+      class:list={[
+        'portfolio-item',
+        !featured && 'mb-4 break-inside-avoid',
+      ]}
+      data-categories={JSON.stringify(item.category)}
+      data-is-adult={item.isAdult.toString()}
+    >
       <PortfolioCard item={item} />
     </div>
   ))}

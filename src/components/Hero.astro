@@ -2,17 +2,24 @@
 import { artist } from '../data/artist';
 ---
 
-<section class="relative overflow-hidden" id="hero">
-  <!-- Gradient background -->
-  <div class="absolute inset-0 bg-gradient-to-br from-secondary via-secondary-light to-surface"></div>
-  <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
-
+<section class="relative overflow-hidden bg-surface" id="hero">
   <!-- Decorative circles -->
   <div class="absolute top-10 right-10 w-64 h-64 rounded-full bg-primary/5 blur-3xl"></div>
   <div class="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-secondary-dark/20 blur-2xl"></div>
 
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
-    <div class="max-w-2xl">
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-28 min-h-[680px] lg:min-h-[720px]">
+    <!-- Hero image -->
+    <div class="pointer-events-none absolute inset-y-0 right-4 hidden lg:flex w-[44%] items-center justify-center">
+      <img
+        src="/images/hero/hero1.png"
+        alt=""
+        aria-hidden="true"
+        class="max-h-[640px] w-full object-contain object-center opacity-95 drop-shadow-2xl"
+      />
+    </div>
+
+    <!-- Text content -->
+    <div class="relative z-10 max-w-xl lg:max-w-[52%] pt-8 lg:pt-16">
       <!-- Status badge -->
       <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur border border-line text-sm font-semibold text-primary mb-6">
         <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -48,6 +55,7 @@ import { artist } from '../data/artist';
           <span data-i18n="hero.cta.portfolio">ดูผลงาน</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
         </a>
+
         <a
           href="/calculator/"
           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-primary font-bold text-base border-2 border-primary/20 hover:border-primary/40 hover:bg-secondary-light transition-colors"
@@ -56,6 +64,7 @@ import { artist } from '../data/artist';
         >
           คำนวณราคา
         </a>
+
         <a
           href="/contact/"
           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/60 text-muted font-bold text-base border border-line hover:text-primary hover:bg-white transition-colors"
@@ -65,6 +74,16 @@ import { artist } from '../data/artist';
           ติดต่อ
         </a>
       </div>
+    </div>
+
+    <!-- Mobile image -->
+    <div class="mt-10 lg:hidden">
+      <img
+        src="/images/hero/hero1.png"
+        alt=""
+        aria-hidden="true"
+        class="mx-auto max-h-[420px] w-full object-contain opacity-95 drop-shadow-xl"
+      />
     </div>
   </div>
 </section>

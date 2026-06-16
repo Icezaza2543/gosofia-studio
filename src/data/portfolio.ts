@@ -1,9 +1,8 @@
 // ─── Portfolio Data ───
 // Source: docs/gosofia-requirements.md section 5.4
 //
-// IMPORTANT: Adult-category items use local placeholder paths only.
+// IMPORTANT: Adult-category items use local preview assets only.
 // Original asset URLs are NOT included in client-facing code.
-// Replace placeholder images with actual artwork files when available.
 
 export interface PortfolioItem {
   id: string;
@@ -40,7 +39,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Lucene',
     category: ['sfw', 'character'],
     description: 'แฟนอาร์ทคุณเน่ น่ารักมากเลยนะ~',
-    image: '/images/portfolio/item-01.svg',
+    image: '/images/portfolio/01-lucene.png',
     isAdult: false,
     allowCrop: false,
     watermark: false,
@@ -51,7 +50,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'ปกโดจิน Leah',
     category: ['sfw', 'character'],
     description: 'ปกโดจินคุณลีอาห์ หมอดูที่เซ็กซี่มาก ๆ เลยนะ~',
-    image: '/images/portfolio/item-02.svg',
+    image: '/images/portfolio/02-leah-cover.png',
     isAdult: false,
     allowCrop: false,
     watermark: false,
@@ -62,7 +61,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Marine Chariot',
     category: ['sfw', 'character'],
     description: 'แฟนอาร์ทคุณหนูมารีน สุดยอดที่สุดเลยนะ!',
-    image: '/images/portfolio/item-03.svg',
+    image: '/images/portfolio/03-marine-chariot.png',
     isAdult: false,
     allowCrop: false,
     watermark: false,
@@ -73,7 +72,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Halloween Commission',
     category: ['adult'],
     description: 'งาน Commission ธีมฮาโลวีน',
-    image: '/images/portfolio/item-04.svg',
+    image: '/images/portfolio/04-adult-preview-01.png',
     isAdult: true,
     allowCrop: false,
     watermark: false,
@@ -84,7 +83,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Gosofia',
     category: ['sfw', 'character'],
     description: 'คุณโก นักวาดเองค่ะ~',
-    image: '/images/portfolio/item-05.svg',
+    image: '/images/portfolio/05-gosofia.png',
     isAdult: false,
     allowCrop: false,
     watermark: false,
@@ -95,7 +94,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'ปกโดจิน Kumazaki Mayu',
     category: ['sfw', 'character'],
     description: 'ปกโดจินของคุณ Kumazaki Mayu',
-    image: '/images/portfolio/item-06.svg',
+    image: '/images/portfolio/06-doujin-cover.png',
     isAdult: false,
     allowCrop: false,
     watermark: false,
@@ -106,7 +105,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Doujin Cover Commission',
     category: ['adult'],
     description: 'งาน Commission ปกโดจิน',
-    image: '/images/portfolio/item-07.svg',
+    image: '/images/portfolio/07-adult-preview-02.png',
     isAdult: true,
     allowCrop: false,
     watermark: false,
@@ -117,7 +116,7 @@ export const portfolio: PortfolioItem[] = [
     title: 'Summer Bonus Art',
     category: ['adult'],
     description: 'โบนัสอาร์ทในโดจิน',
-    image: '/images/portfolio/item-08.svg',
+    image: '/images/portfolio/08-adult-preview-03.png',
     isAdult: true,
     allowCrop: false,
     watermark: false,
