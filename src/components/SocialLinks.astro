@@ -14,10 +14,10 @@ const { compact = false } = Astro.props;
     type="button"
     class:list={[
       'relative inline-flex items-center gap-2 font-semibold rounded-xl border transition-all cursor-pointer text-left',
-      compact
-        ? 'px-3 py-2 text-sm border-line bg-white text-muted hover:text-primary hover:bg-secondary-light hover:border-primary/20'
-        : 'px-5 py-3 text-base border-line bg-white text-muted hover:text-primary hover:bg-secondary hover:border-primary/30 shadow-sm hover:shadow-md',
+      'hover:-translate-y-0.5 hover:shadow-sm hover:bg-[var(--hover-bg)]',
+      compact ? 'px-3 py-2 text-sm' : 'px-5 py-3 text-base shadow-sm hover:shadow-md',
     ]}
+    style="background-color: #F5EBE1; border-color: #E0CBB5; color: #7A5C43; --hover-bg: #EADFD3;"
     onclick="const btn = this; navigator.clipboard.writeText('gosofiade@gmail.com').then(() => { const t = btn.querySelector('.email-toast'); t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2000) }).catch(() => { alert('gosofiade@gmail.com') })"
     id="social-email-copy"
   >
@@ -35,10 +35,10 @@ const { compact = false } = Astro.props;
     rel="noopener noreferrer"
     class:list={[
       'inline-flex items-center gap-2 font-semibold rounded-xl border transition-all',
-      compact
-        ? 'px-3 py-2 text-sm border-line bg-white text-muted hover:text-primary hover:bg-secondary-light hover:border-primary/20'
-        : 'px-5 py-3 text-base border-line bg-white text-muted hover:text-primary hover:bg-secondary hover:border-primary/30 shadow-sm hover:shadow-md',
+      'hover:-translate-y-0.5 hover:shadow-sm hover:bg-[var(--hover-bg)]',
+      compact ? 'px-3 py-2 text-sm' : 'px-5 py-3 text-base shadow-sm hover:shadow-md',
     ]}
+    style="background-color: #FCE4E4; border-color: #ECA8A8; color: #A83F3F; --hover-bg: #F4D3D3;"
     id="social-email-gmail"
   >
     <span class="flex-shrink-0">
@@ -54,10 +54,10 @@ const { compact = false } = Astro.props;
       rel="noopener noreferrer"
       class:list={[
         'inline-flex items-center gap-2 font-semibold rounded-xl border transition-all',
-        compact
-          ? 'px-3 py-2 text-sm border-line bg-white text-muted hover:text-primary hover:bg-secondary-light hover:border-primary/20'
-          : 'px-5 py-3 text-base border-line bg-white text-muted hover:text-primary hover:bg-secondary hover:border-primary/30 shadow-sm hover:shadow-md',
+        'hover:-translate-y-0.5 hover:shadow-sm hover:bg-[var(--hover-bg)]',
+        compact ? 'px-3 py-2 text-sm' : 'px-5 py-3 text-base shadow-sm hover:shadow-md',
       ]}
+      style={`background-color: ${social.colors.bg}; border-color: ${social.colors.border}; color: ${social.colors.text}; --hover-bg: ${social.colors.hoverBg};`}
       id={`social-${social.platform}`}
     >
       <span class="flex-shrink-0" set:html={social.icon} />

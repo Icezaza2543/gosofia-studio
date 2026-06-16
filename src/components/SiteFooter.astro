@@ -9,7 +9,13 @@ import { artist } from '../data/artist';
       <!-- Brand -->
       <div>
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-8 h-8 rounded-md bg-primary text-white font-extrabold text-sm grid place-items-center">G</div>
+          <img
+            src="/images/brand/logo-gosofia.png"
+            alt="Gosofia"
+            width="32"
+            height="32"
+            class="w-8 h-8 rounded-md bg-white object-contain shadow-sm"
+          />
           <span class="text-lg font-bold text-primary">{artist.name}</span>
         </div>
         <p class="text-sm text-muted leading-relaxed" data-i18n="footer.bio">{artist.bioShort}</p>
@@ -32,7 +38,8 @@ import { artist } from '../data/artist';
         <div class="flex flex-wrap gap-2">
           <button
             type="button"
-            class="relative w-9 h-9 rounded-lg border border-line bg-surface hover:bg-secondary hover:border-primary/20 text-muted hover:text-primary transition-all grid place-items-center cursor-pointer"
+            class="relative w-9 h-9 rounded-lg border transition-all grid place-items-center cursor-pointer hover:-translate-y-0.5 hover:bg-[var(--hover-bg)]"
+            style="background-color: #F5EBE1; border-color: #E0CBB5; color: #7A5C43; --hover-bg: #EADFD3;"
             onclick="const btn = this; navigator.clipboard.writeText('gosofiade@gmail.com').then(() => { const t = btn.querySelector('.email-toast'); t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2000) }).catch(() => { alert('gosofiade@gmail.com') })"
             title="คัดลอกอีเมล"
             data-i18n-title="social.email.copybtn"
@@ -45,7 +52,8 @@ import { artist } from '../data/artist';
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="w-9 h-9 rounded-lg border border-line bg-surface hover:bg-secondary hover:border-primary/20 text-muted hover:text-primary transition-all grid place-items-center"
+              class="w-9 h-9 rounded-lg border transition-all grid place-items-center hover:-translate-y-0.5 hover:bg-[var(--hover-bg)]"
+              style={`background-color: ${social.colors.bg}; border-color: ${social.colors.border}; color: ${social.colors.text}; --hover-bg: ${social.colors.hoverBg};`}
               title={social.label}
             >
               <Fragment set:html={social.icon} />
