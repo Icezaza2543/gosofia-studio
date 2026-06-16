@@ -50,8 +50,8 @@ The site balances two needs:
 - **Bilingual interface**  
   Thai and English language toggle, including calculator text, generated brief text, price labels, and currency display.
 
-- **THB / USD display**  
-  Thai mode uses THB. English mode converts display prices to USD with a static display rate in `src/lib/formatMoney.ts`.
+- **Dual-Currency pricing**  
+  Thai mode uses THB. English mode displays explicit, non-converted USD prices configured directly in `src/data/pricing.ts`.
 
 - **Terms and FAQ**  
   Clear support pages for commission process, payment, revisions, usage rights, artist rights, adult-content policy, and common client questions.

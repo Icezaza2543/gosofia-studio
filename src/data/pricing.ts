@@ -1,7 +1,7 @@
 // ─── Pricing Configuration ───
 // Source: docs/gosofia-requirements.md sections 6 and 7
 //
-// NOTE: All prices in Thai Baht (THB).
+// NOTE: All prices are explicitly configured in both Thai Baht (THB) and USD.
 // These pricing rules can be adjusted after artist review.
 
 export interface WorkTypeConfig {
