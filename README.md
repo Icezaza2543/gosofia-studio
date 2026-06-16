@@ -1,46 +1,202 @@
-# Gosofia Studio MVP
+# Gosofia Studio
 
-Interactive commission calculator, pricing, and portfolio website for Gosofia.
+<p align="center">
+  <img src="./public/images/og/og-image.png" alt="Gosofia Studio preview" width="860" />
+</p>
+
+<p align="center">
+  <strong>Artist portfolio, commission pricing, and client brief experience for Gosofia / โกโซเฟีย.</strong>
+</p>
+
+<p align="center">
+  A soft, polished, bilingual website made for an illustrator who turns characters, fan art, Vtuber ideas, merch concepts, and commission dreams into finished artwork.
+</p>
+
+<p align="center">
+  <a href="https://astro.build/">Astro</a> ·
+  <a href="https://tailwindcss.com/">Tailwind CSS</a> ·
+  TypeScript ·
+  Static Deployment
+</p>
+
+---
+
+## Overview
+
+Gosofia Studio is a public-facing portfolio and commission website for the artist Gosofia. It is designed to feel welcoming to clients while still giving them the practical tools they need before reaching out: portfolio browsing, pricing guidance, Terms of Service, FAQ, and an interactive commission calculator that turns selections into a copyable brief.
+
+The site balances two needs:
+
+- **For visitors and clients**: browse artwork, understand commission options, estimate budget, and prepare a clear brief.
+- **For the artist and maintainer**: keep content static, easy to update, production-safe, and protected from unauthorized reuse.
+
+## Experience
+
+- **Portfolio gallery**  
+  Showcases selected works with local production-safe image paths.
+
+- **Adult-content handling**  
+  Adult-category artwork remains blurred by default and requires an age gate before preview.
+
+- **Featured works**  
+  Homepage highlights SFW works only, using a responsive featured grid.
+
+- **Commission calculator**  
+  Calculates estimated pricing from work type, color mode, character count, complexity, background, add-ons, rush options, commercial usage, Live2D separation, adult-content policy, and deposit.
+
+- **Copyable client brief**  
+  Generates a structured brief clients can paste into Discord, X/Twitter, email, or another contact channel.
+
+- **Bilingual interface**  
+  Thai and English language toggle, including calculator text, generated brief text, price labels, and currency display.
+
+- **THB / USD display**  
+  Thai mode uses THB. English mode converts display prices to USD with a static display rate in `src/lib/formatMoney.ts`.
+
+- **Terms and FAQ**  
+  Clear support pages for commission process, payment, revisions, usage rights, artist rights, adult-content policy, and common client questions.
+
+## Visual Assets
+
+Production image assets live under `public/images` and are referenced with lowercase English filenames.
+
+```txt
+public/images/
+  brand/
+    logo-gosofia.png
+    watermark-gosofia.png
+  hero/
+    hero.png
+  og/
+    og-image.png
+  portfolio/
+    01-lucene.png
+    02-leah-cover.png
+    03-marine-chariot.png
+    04-adult-preview-01.png
+    05-gosofia.png
+    06-doujin-cover.png
+    07-adult-preview-02.png
+    08-adult-preview-03.png
+  status/
+    commission-open.png
+```
+
+Important notes:
+
+- Do not hotlink Google Drive, Wix, or other external image hosts in production code.
+- Do not use Thai filenames, spaces, or special characters for production image paths.
+- Do not use adult-category artwork for homepage featured works or Open Graph metadata.
+- Keep artwork display respectful: portfolio images use no-crop presentation by default.
 
 ## Tech Stack
-- Framework: [Astro](https://astro.build/)
-- UI/Styling: [Tailwind CSS v4](https://tailwindcss.com/)
-- Language: [TypeScript](https://www.typescriptlang.org/)
-- Deployment: [Vercel](https://vercel.com/) (Static)
 
-## Features
-- **Portfolio**: SFW items shown publicly. Adult content requires an age-gate confirmation modal and is blurred by default.
-- **Calculator**: Interactive commission calculator with logic defined per requirements (base + character + complexity + background + adult/live2d + flat rates + commercial). Generates copyable briefs.
-- **Pricing**: Clear table structure with base prices and estimated turnaround times.
-- **TOS & FAQ**: Clean layouts for terms of service and frequent questions.
+| Layer | Tooling |
+| --- | --- |
+| Framework | Astro |
+| Styling | Tailwind CSS v4 |
+| Language | TypeScript |
+| Build output | Static site |
+| Deployment target | Vercel or any static host |
 
-## Setup & Development
+## Project Structure
+
+```txt
+src/
+  components/       UI components and interactive sections
+  data/             Static artist, pricing, portfolio, i18n, FAQ, and terms data
+  layouts/          Shared document layout and metadata
+  lib/              Calculator, brief builder, currency formatting helpers
+  pages/            Astro routes
+  styles/           Global theme and utility styles
+
+public/
+  images/           Local production image assets
+  favicon.svg
+  robots.txt
+```
+
+Key files:
+
+- `src/data/artist.ts` — artist profile and commission status
+- `src/data/portfolio.ts` — portfolio entries and adult-content flags
+- `src/data/pricing.ts` — commission pricing configuration
+- `src/data/i18n.ts` — Thai and English UI copy
+- `src/lib/calculatePrice.ts` — pricing calculation logic
+- `src/lib/buildBrief.ts` — copyable commission brief generation
+- `src/lib/formatMoney.ts` — THB and USD display formatting
+
+## Development
+
+Install dependencies:
 
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start local dev server
+Start the local dev server:
+
+```bash
 npm run dev
+```
 
-# Build for production
+Build for production:
+
+```bash
 npm run build
 ```
 
-## Content Management
+Preview the production build:
 
-Since there is no database in the MVP, all data is stored statically in TypeScript files:
+```bash
+npm run preview
+```
 
-- `src/data/artist.ts`: Bio, name, email.
-- `src/data/pricing.ts`: Pricing structure, base prices, flat rate add-ons, and multipliers.
-- `src/data/portfolio.ts`: Portfolio items (both SFW and 18+). Add local images to `public/images/portfolio/`.
-- `src/data/terms.ts`: Terms of service content.
-- `src/data/faq.ts`: FAQ content.
+## Content Updates
 
-**Important regarding 18+ content**: Do not put explicit Google Drive links or original URLs inside `src/data/portfolio.ts`. It will be publicly visible in source code. Download the images, downsize them, and put them inside `public/images/portfolio/`.
+Most site content is intentionally static and stored in TypeScript files:
 
-## Author
-Gosofia (โกโซเฟีย)
+- Update artist profile in `src/data/artist.ts`.
+- Update pricing rules in `src/data/pricing.ts`.
+- Update portfolio entries in `src/data/portfolio.ts`.
+- Update Thai/English copy in `src/data/i18n.ts`.
+- Update Terms of Service in `src/data/terms.ts`.
+- Update FAQ content in `src/data/faq.ts`.
+
+For portfolio assets, add optimized local files to `public/images/portfolio/` and reference them as `/images/portfolio/file-name.png`.
+
+## Adult Content Policy
+
+This project includes adult-category portfolio previews. To keep the site safe and intentional:
+
+- Adult items are flagged with `isAdult: true`.
+- Adult images are blurred by default.
+- Adult previews require age confirmation.
+- Adult items are excluded from homepage featured works.
+- Adult images are not used for Open Graph metadata.
+
+## Build Checklist
+
+Before publishing meaningful changes:
+
+```bash
+npm run build
+```
+
+Recommended checks:
+
+- Homepage loads and featured works remain SFW.
+- Portfolio grid keeps adult images blurred by default.
+- Age gate opens before adult previews.
+- TH/EN language toggle updates calculator text and generated brief text.
+- TH mode displays THB; EN mode displays USD.
+- No external hotlinked artwork is introduced.
+
+## Credits
+
+- **Artist / brand / artwork**: Gosofia / โกโซเฟีย
+- **Website source code and implementation**: Icezaza Ch
+- **Framework and tooling**: Astro, Tailwind CSS, TypeScript, and the open-source ecosystem
 
 ## License & Copyright
 
