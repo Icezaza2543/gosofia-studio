@@ -81,10 +81,10 @@ export const portfolio: PortfolioItem[] = [
   {
     id: 'item-05',
     title: 'Gosofia',
-    category: ['sfw', 'character'],
+    category: ['adult', 'character'],
     description: 'คุณโก นักวาดเองค่ะ~',
     image: '/images/portfolio/05-gosofia.png',
-    isAdult: false,
+    isAdult: true,
     allowCrop: false,
     watermark: false,
     canShow: true,

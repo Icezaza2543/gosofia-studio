@@ -11,10 +11,10 @@ import { artist } from '../data/artist';
     <!-- Hero image -->
     <div class="pointer-events-none absolute inset-y-0 right-4 hidden lg:flex w-[44%] items-center justify-center">
       <img
-        src="/images/hero/hero1.png"
+        src="/images/hero/hero.png"
         alt=""
         aria-hidden="true"
-        class="max-h-[640px] w-full object-contain object-center opacity-95 drop-shadow-2xl"
+        class="hero-art max-h-[640px] w-full rounded-none object-contain object-center opacity-95"
       />
     </div>
 
@@ -79,11 +79,45 @@ import { artist } from '../data/artist';
     <!-- Mobile image -->
     <div class="mt-10 lg:hidden">
       <img
-        src="/images/hero/hero1.png"
+        src="/images/hero/hero.png"
         alt=""
         aria-hidden="true"
-        class="mx-auto max-h-[420px] w-full object-contain opacity-95 drop-shadow-xl"
+        class="hero-art mx-auto max-h-[420px] w-full rounded-none object-contain opacity-95"
       />
     </div>
   </div>
 </section>
+
+<style>
+  .hero-art {
+    filter:
+      drop-shadow(0 22px 34px rgba(100, 14, 0, 0.16))
+      drop-shadow(0 0 18px rgba(196, 57, 46, 0.18));
+    transform-origin: center;
+    animation: hero-art-float 5.5s ease-in-out infinite;
+    will-change: transform, filter;
+  }
+
+  @keyframes hero-art-float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+      filter:
+        drop-shadow(0 22px 34px rgba(100, 14, 0, 0.16))
+        drop-shadow(0 0 18px rgba(196, 57, 46, 0.18));
+    }
+
+    50% {
+      transform: translate3d(0, -10px, 0) scale(1.012);
+      filter:
+        drop-shadow(0 28px 42px rgba(100, 14, 0, 0.2))
+        drop-shadow(0 0 26px rgba(255, 184, 174, 0.34));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-art {
+      animation: none;
+    }
+  }
+</style>

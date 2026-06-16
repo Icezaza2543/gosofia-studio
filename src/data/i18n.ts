@@ -33,7 +33,7 @@ export const i18n = {
 
     // Portfolio
     'portfolio.title': '🎨 ผลงาน / Portfolio',
-    'portfolio.desc': 'เลือกหมวดหมู่เพื่อกรองผลงาน — ภาพ 18+ จะถูกเบลอไว้จนกว่าจะยืนยันอายุ',
+    'portfolio.desc': 'เลือกหมวดหมู่เพื่อกรองผลงาน',
     'portfolio.filter.all': 'ทั้งหมด',
     'portfolio.filter.sfw': 'SFW',
     'portfolio.filter.adult': '18+',
@@ -181,7 +181,7 @@ export const i18n = {
 
     // Portfolio
     'portfolio.title': '🎨 Portfolio',
-    'portfolio.desc': 'Select categories to filter — 18+ artworks are blurred until age is confirmed.',
+    'portfolio.desc': 'Select categories to filter.',
     'portfolio.filter.all': 'All',
     'portfolio.filter.sfw': 'SFW',
     'portfolio.filter.adult': '18+',
