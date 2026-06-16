@@ -3,6 +3,7 @@
 export type MoneyLanguage = 'th' | 'en';
 
 export const THB_PER_USD = 32.5;
+export const USD_DISPLAY_MARKUP = 20;
 
 const thaiFormatter = new Intl.NumberFormat('th-TH', {
   style: 'currency',
@@ -28,8 +29,11 @@ export function usdToThb(amount: number): number {
  * Format a THB-denominated amount for the active display language.
  * Example: formatMoney(1200) → "฿1,200"
  */
-export function formatMoney(amount: number, lang: MoneyLanguage = 'th'): string {
-  return lang === 'en'
-    ? englishFormatter.format(thbToUsd(amount)).replace(/\s+/g, ' ')
-    : thaiFormatter.format(amount);
+export function formatMoney(amount: number, lang: MoneyLanguage = 'th', options?: { applyUsdMarkup?: boolean }): string {
+  if (lang === 'en') {
+    const baseUsd = thbToUsd(amount);
+    const finalUsd = (options?.applyUsdMarkup && baseUsd > 0) ? baseUsd + USD_DISPLAY_MARKUP : baseUsd;
+    return englishFormatter.format(finalUsd).replace(/\s+/g, ' ');
+  }
+  return thaiFormatter.format(amount);
 }

@@ -13,11 +13,13 @@ const { item } = Astro.props;
   class:list={[
     'portfolio-card group block w-full text-left rounded-xl border border-line bg-white overflow-hidden transition-all hover:shadow-lg hover:border-primary/20 break-inside-avoid mb-4',
     item.isAdult && 'is-adult',
+    item.isBlurred && 'is-blurred',
   ]}
   data-item-id={item.id}
   data-is-adult={item.isAdult.toString()}
   data-title={item.title}
   data-image={item.image}
+  data-gallery={encodeURIComponent(JSON.stringify(item.galleryImages ?? [item.coverImage ?? item.image]))}
   data-description={item.description}
 >
   <!-- Image -->
@@ -28,11 +30,12 @@ const { item } = Astro.props;
       class:list={[
         'w-full aspect-[3/4] transition-transform duration-300 group-hover:scale-[1.02]',
         item.allowCrop ? 'object-cover' : 'object-contain',
-        item.isAdult && 'adult-blur',
+        item.isBlurred && 'adult-blur',
       ]}
       loading="lazy"
+      onerror={`this.onerror=null;this.src='${item.isAdult || item.isBlurred ? '/images/portfolio/portfolio-r18-placeholder.png' : '/images/portfolio/portfolio-placeholder.png'}';`}
     />
-    {item.isAdult && (
+    {(item.isAdult || item.isBlurred) && (
       <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 text-white opacity-100 group-hover:opacity-0 transition-opacity duration-300 pointer-events-none">
         <div class="text-4xl mb-2">🔞</div>
         <span class="font-bold px-3 py-1 bg-black/60 rounded-full text-sm backdrop-blur-md" data-i18n="portfolio.adult.badge">18+ Preview</span>
@@ -47,7 +50,7 @@ const { item } = Astro.props;
     <div class="mt-3 flex flex-wrap gap-1.5">
       {item.category.map((cat) => (
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary-light text-primary/70 border border-secondary-dark/20">
-          {cat}
+          {cat === 'adult' ? '18+ NSFW' : cat}
         </span>
       ))}
     </div>

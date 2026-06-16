@@ -12,7 +12,7 @@ import { faq } from '../data/faq';
         aria-controls={`faq-panel-${index}`}
         id={`faq-btn-${index}`}
       >
-        <span class="text-base">{item.question}</span>
+        <span class="text-base" data-i18n={`faq.q${index}`}>{item.question}</span>
         <svg
           class="faq-icon w-5 h-5 flex-shrink-0 text-muted transition-transform duration-200"
           viewBox="0 0 24 24"
@@ -29,7 +29,7 @@ import { faq } from '../data/faq';
         role="region"
         aria-labelledby={`faq-btn-${index}`}
       >
-        <p class="text-base text-muted leading-relaxed">{item.answer}</p>
+        <p class="text-base text-muted leading-relaxed" data-i18n={`faq.a${index}`}>{item.answer}</p>
       </div>
     </div>
   ))}

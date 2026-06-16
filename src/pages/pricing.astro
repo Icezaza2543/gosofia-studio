@@ -14,8 +14,8 @@ import { formatMoney } from '../lib/formatMoney';
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-extrabold text-ink">💰 เรตราคา Commission</h1>
-      <p class="text-muted mt-2">ราคาเริ่มต้นตามประเภทงาน — ราคาจริงอาจปรับตามดีเทลและ scope จริง</p>
+      <h1 class="text-3xl font-extrabold text-ink" data-i18n="pricing.page.title">💰 เรตราคา Commission</h1>
+      <p class="text-muted mt-2" data-i18n="pricing.page.desc">ราคาเริ่มต้นตามประเภทงาน — ราคาจริงอาจปรับตามดีเทลและ scope จริง</p>
     </div>
 
     <!-- Work Types Table -->
@@ -24,24 +24,24 @@ import { formatMoney } from '../lib/formatMoney';
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-secondary-light border-b border-line">
-              <th class="px-5 py-3 text-left font-bold text-primary">ประเภทงาน</th>
+              <th class="px-5 py-3 text-left font-bold text-primary" data-i18n="pricing.table.type">ประเภทงาน</th>
               <th class="px-5 py-3 text-right font-bold text-primary">B/W</th>
               <th class="px-5 py-3 text-right font-bold text-primary">Full Color</th>
-              <th class="px-5 py-3 text-right font-bold text-primary">ระยะเวลา (วัน)</th>
+              <th class="px-5 py-3 text-right font-bold text-primary" data-i18n="pricing.table.days">ระยะเวลา (วัน)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-line">
             {workTypes.map((wt) => (
               <tr class="hover:bg-surface transition-colors">
                 <td class="px-5 py-3">
-                  <div class="font-semibold text-ink">{wt.label}</div>
-                  <div class="text-xs text-muted">{wt.labelTh}</div>
+                  <div class="font-semibold text-ink" data-i18n={`pricing.wt.${wt.id}.en`}>{wt.label}</div>
+                  <div class="text-xs text-muted" data-i18n={`pricing.wt.${wt.id}.th`}>{wt.labelTh}</div>
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-ink">
-                  {wt.bw !== null ? <span data-money-thb={wt.bw}>{formatMoney(wt.bw)}</span> : '—'}
+                  {wt.id === 'doujin' ? <span data-i18n="pricing.doujin.pages">450 THB / หน้า (ขาวดำ)</span> : (wt.bw !== null ? <span data-money-thb={wt.bw}>{formatMoney(wt.bw)}</span> : '—')}
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-primary">
-                  <span data-money-thb={wt.color}>{formatMoney(wt.color)}</span>
+                  {wt.id === 'doujin' ? <span data-i18n="pricing.doujin.cover">ตามสเกลหน้าปก</span> : <span data-money-thb={wt.color}>{formatMoney(wt.color)}</span>}
                 </td>
                 <td class="px-5 py-3 text-right text-muted">
                   {wt.estimatedDays[0]}–{wt.estimatedDays[1]}
@@ -57,12 +57,12 @@ import { formatMoney } from '../lib/formatMoney';
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       <!-- Complexity -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">🎯 ดีเทลตัวละคร</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.complexity">🎯 ดีเทลตัวละคร</h3>
         <ul class="space-y-2">
           {complexityOptions.map((opt) => (
             <li class="flex justify-between text-sm">
-              <span class="text-muted">{opt.labelTh}</span>
-              <span class="font-semibold text-ink">{opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}</span>
+              <span class="text-muted" data-i18n={`pricing.complexity.${opt.id}`}>{opt.labelTh}</span>
+              <span class="font-semibold text-ink">{opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}</span>
             </li>
           ))}
         </ul>
@@ -70,13 +70,13 @@ import { formatMoney } from '../lib/formatMoney';
 
       <!-- Background -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">🖼️ ฉาก</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.bg">🖼️ ฉาก</h3>
         <ul class="space-y-2">
           {backgroundOptions.map((opt) => (
             <li class="flex justify-between text-sm">
-              <span class="text-muted">{opt.labelTh}</span>
+              <span class="text-muted" data-i18n={`pricing.bg.${opt.id}`}>{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}
+                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
               </span>
             </li>
           ))}
@@ -85,13 +85,13 @@ import { formatMoney } from '../lib/formatMoney';
 
       <!-- Rush -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">⚡ งานเร่ง</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.rush">⚡ งานเร่ง</h3>
         <ul class="space-y-2">
           {rushOptions.map((opt) => (
             <li class="flex justify-between text-sm">
-              <span class="text-muted">{opt.labelTh}</span>
+              <span class="text-muted" data-i18n={`pricing.rush.${opt.id}`}>{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}
+                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
               </span>
             </li>
           ))}
@@ -100,18 +100,18 @@ import { formatMoney } from '../lib/formatMoney';
 
       <!-- Multipliers -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">📊 ตัวคูณ</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.multipliers">📊 ตัวคูณ</h3>
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
-            <span class="text-muted">เชิงพาณิชย์</span>
+            <span class="text-muted" data-i18n="pricing.multipliers.commercial">เชิงพาณิชย์</span>
             <span class="font-semibold text-ink">×{COMMERCIAL_MULTIPLIER}</span>
           </li>
           <li class="flex justify-between text-sm">
-            <span class="text-muted">เนื้อหาผู้ใหญ่</span>
+            <span class="text-muted" data-i18n="pricing.multipliers.adult">เนื้อหาผู้ใหญ่</span>
             <span class="font-semibold text-ink">+{ADULT_RATE * 100}%</span>
           </li>
           <li class="flex justify-between text-sm">
-            <span class="text-muted">แยกพาร์ต Live2D</span>
+            <span class="text-muted" data-i18n="pricing.multipliers.live2d">แยกพาร์ต Live2D</span>
             <span class="font-semibold text-ink">+{LIVE2D_RATE * 100}%</span>
           </li>
         </ul>
@@ -119,18 +119,18 @@ import { formatMoney } from '../lib/formatMoney';
 
       <!-- Flat Add-ons -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">🔧 ตัวเลือกเสริม</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.extras">🔧 ตัวเลือกเสริม</h3>
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
-            <span class="text-muted">ไฟล์ PSD (Vtuber)</span>
+            <span class="text-muted" data-i18n="pricing.extras.psd">ไฟล์ PSD (Vtuber)</span>
             <span class="font-semibold text-ink" data-money-thb={SOURCE_FILE_PRICE}>{formatMoney(SOURCE_FILE_PRICE)}</span>
           </li>
           <li class="flex justify-between text-sm">
-            <span class="text-muted">Rigging</span>
+            <span class="text-muted" data-i18n="calc.addons.rigging">Rigging</span>
             <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={RIGGING_BASE_PRICE}>{formatMoney(RIGGING_BASE_PRICE)}</span></span>
           </li>
           <li class="flex justify-between text-sm">
-            <span class="text-muted">ชิ้นส่วนเพิ่ม</span>
+            <span class="text-muted" data-i18n="pricing.extras.parts">ชิ้นส่วนเพิ่ม</span>
             <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={EXTRA_PARTS_PRICE} data-money-suffix-th="/ชิ้น" data-money-suffix-en="/part">{formatMoney(EXTRA_PARTS_PRICE)}/ชิ้น</span></span>
           </li>
         </ul>
@@ -138,14 +138,14 @@ import { formatMoney } from '../lib/formatMoney';
 
       <!-- Deposit -->
       <div class="rounded-xl border border-line bg-white p-5">
-        <h3 class="text-base font-bold text-ink mb-3">💳 การชำระเงิน</h3>
+        <h3 class="text-base font-bold text-ink mb-3" data-i18n="pricing.addons.payment">💳 การชำระเงิน</h3>
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
-            <span class="text-muted">มัดจำขั้นต่ำ</span>
+            <span class="text-muted" data-i18n="pricing.payment.deposit">มัดจำขั้นต่ำ</span>
             <span class="font-semibold text-ink" data-money-thb={MINIMUM_DEPOSIT}>{formatMoney(MINIMUM_DEPOSIT)}</span>
           </li>
-          <li class="text-sm text-muted">ผ่อนได้สูงสุด 3 งวด</li>
-          <li class="text-sm text-muted">รับชำระผ่าน Stripe, Wise, Ko-fi</li>
+          <li class="text-sm text-muted" data-i18n="pricing.payment.installments">ผ่อนได้สูงสุด 3 งวด</li>
+          <li class="text-sm text-muted" data-i18n="pricing.payment.methods">รับชำระผ่าน Stripe, Wise, Ko-fi</li>
         </ul>
       </div>
     </div>
@@ -155,6 +155,7 @@ import { formatMoney } from '../lib/formatMoney';
       <a
         href="/calculator/"
         class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-colors shadow-lg shadow-primary/20"
+        data-i18n="pricing.cta"
       >
         🧮 ลองคำนวณราคาเลย
       </a>

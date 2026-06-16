@@ -26,6 +26,7 @@ import {
   MINIMUM_DEPOSIT,
   RANGE_LOW_FACTOR,
   RANGE_HIGH_FACTOR,
+  DOUJIN_PAGE_PRICE_THB,
   type WorkTypeConfig,
 } from '../data/pricing';
 
@@ -44,6 +45,10 @@ export interface CalculatorInput {
   wantRigging: boolean;
   extraPartsCount: number;
   depositAmount: number;
+  // Doujin-specific
+  doujinPages: number;
+  wantCover: boolean;
+  coverScaleId: string;
 }
 
 export interface BreakdownItem {
@@ -93,6 +98,17 @@ function labelFor(
 }
 
 export function calculatePrice(input: CalculatorInput, lang: PriceLanguage = 'th'): PriceResult {
+  if (input.workTypeId === 'doujin') {
+    return calculateDoujinPrice(input, lang);
+  }
+  return calculateIllustrationPrice(input, lang, { includeGlobalModifiers: true });
+}
+
+export function calculateIllustrationPrice(
+  input: CalculatorInput, 
+  lang: PriceLanguage, 
+  options: { includeGlobalModifiers: boolean }
+): PriceResult {
   // ─── Step 0: Resolve configs ───
   const workType = workTypes.find((w) => w.id === input.workTypeId) ?? workTypes[0];
   const complexity = complexityOptions.find((c) => c.id === input.complexityId) ?? complexityOptions[1];
@@ -100,140 +116,76 @@ export function calculatePrice(input: CalculatorInput, lang: PriceLanguage = 'th
   const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
 
   // ─── Step 1: Art subtotal ───
-  // base = work type price for selected color mode
   const base = (input.colorMode === 'bw' && workType.bw !== null)
     ? workType.bw
     : workType.color;
 
-  // Additional characters cost the same base price per character
   const characterCount = Math.max(1, Math.min(6, input.characterCount));
   const characterFee = (characterCount - 1) * base;
-
-  // Complexity: flat surcharge
   const complexityFee = complexity.surcharge;
-
-  // Background: flat surcharge (null means unavailable, treat as 0)
   const backgroundFee = background.surcharge ?? 0;
-
-  // artSubtotal = base + additionalCharacters + complexity + background
   const artSubtotal = base + characterFee + complexityFee + backgroundFee;
 
-  // ─── Step 2: Adult fee (+20% of artSubtotal) ───
-  const adultFee = (input.isAdult && workType.adultAvailable)
-    ? Math.round(artSubtotal * ADULT_RATE)
-    : 0;
+  let adultFee = 0;
+  let live2dFee = 0;
+  let commercialFee = 0;
+  let rushFee = 0;
+  let sourceFileFee = 0;
+  let riggingFee = 0;
+  let extraPartsFee = 0;
 
-  // ─── Step 3: Live2D part separation (+50% of artSubtotal) ───
-  // Not applicable if work type is already Vtuber (includes basic separation)
-  const live2dFee = (input.isLive2D && workType.id !== 'vtuber')
-    ? Math.round(artSubtotal * LIVE2D_RATE)
-    : 0;
+  if (options.includeGlobalModifiers) {
+    adultFee = (input.isAdult && workType.adultAvailable) ? Math.round(artSubtotal * ADULT_RATE) : 0;
+    live2dFee = (input.isLive2D && workType.id !== 'vtuber') ? Math.round(artSubtotal * LIVE2D_RATE) : 0;
+    const adjustedArt = artSubtotal + adultFee + live2dFee;
+    commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
+    
+    rushFee = rush.surcharge ?? 0;
+    sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber') ? SOURCE_FILE_PRICE : 0;
+    riggingFee = input.wantRigging ? RIGGING_BASE_PRICE : 0;
+    extraPartsFee = Math.max(0, input.extraPartsCount) * EXTRA_PARTS_PRICE;
+  }
 
-  // ─── Step 4: Adjusted artwork total ───
   const adjustedArt = artSubtotal + adultFee + live2dFee;
-
-  // ─── Step 5: Commercial fee (x2 means we add 1x more) ───
-  const commercialFee = input.isCommercial
-    ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1))
-    : 0;
-
-  // ─── Step 6: Flat fees ───
-  const rushFee = rush.surcharge ?? 0;
-  const sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber')
-    ? SOURCE_FILE_PRICE
-    : 0;
-  const riggingFee = input.wantRigging ? RIGGING_BASE_PRICE : 0;
-  const extraPartsFee = Math.max(0, input.extraPartsCount) * EXTRA_PARTS_PRICE;
   const flatFees = rushFee + sourceFileFee + riggingFee + extraPartsFee;
-
-  // ─── Step 7: Total ───
   const total = adjustedArt + commercialFee + flatFees;
 
-  // ─── Price range estimation ───
   const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR)) / 10) * 10);
   const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)) / 10) * 10;
-
-  // ─── Deposit calculation ───
   const deposit = Math.min(total, Math.max(MINIMUM_DEPOSIT, input.depositAmount));
   const balance = Math.max(0, total - deposit);
 
-  // ─── Build breakdown ───
   const breakdown: BreakdownItem[] = [];
   const colorLabel = (input.colorMode === 'bw' && workType.hasColorChoice) ? 'B/W' : 'Full Color';
 
   breakdown.push({ label: `${workType.label} / ${colorLabel}`, amount: base });
   if (characterFee > 0) {
     breakdown.push({
-      label: lang === 'en'
-        ? `Additional character x${characterCount - 1}`
-        : `ตัวละครเพิ่ม ×${characterCount - 1}`,
+      label: lang === 'en' ? `Additional character x${characterCount - 1}` : `ตัวละครเพิ่ม ×${characterCount - 1}`,
       amount: characterFee,
     });
   }
   if (complexityFee > 0) {
     breakdown.push({
-      label: lang === 'en'
-        ? `Character detail: ${complexity.label}`
-        : `ดีเทล ${complexity.labelTh}`,
+      label: lang === 'en' ? `Character detail: ${complexity.label}` : `ดีเทล ${complexity.labelTh}`,
       amount: complexityFee,
     });
   }
   if (backgroundFee > 0) breakdown.push({ label: labelFor(background, lang), amount: backgroundFee });
-  if (adultFee > 0) {
-    breakdown.push({
-      label: lang === 'en' ? 'Adult content (18+) (+20%)' : 'เนื้อหาสำหรับผู้ใหญ่ (+20%)',
-      amount: adultFee,
-    });
-  }
-  if (live2dFee > 0) {
-    breakdown.push({
-      label: lang === 'en' ? 'Live2D part separation (+50%)' : 'แยกพาร์ต Live2D (+50%)',
-      amount: live2dFee,
-    });
-  }
-  if (commercialFee > 0) {
-    breakdown.push({
-      label: lang === 'en' ? 'Commercial use (x2)' : 'สิทธิ์เชิงพาณิชย์ (×2)',
-      amount: commercialFee,
-    });
-  }
-  if (rushFee > 0) breakdown.push({ label: labelFor(rush, lang), amount: rushFee });
-  if (sourceFileFee > 0) {
-    breakdown.push({
-      label: lang === 'en' ? 'PSD source file' : 'ไฟล์ PSD / Source File',
-      amount: sourceFileFee,
-    });
-  }
-  if (riggingFee > 0) breakdown.push({ label: 'Rigging', amount: riggingFee });
-  if (extraPartsFee > 0) {
-    breakdown.push({
-      label: lang === 'en' ? `Extra parts x${input.extraPartsCount}` : `ชิ้นส่วนเพิ่ม ×${input.extraPartsCount}`,
-      amount: extraPartsFee,
-    });
+  
+  if (options.includeGlobalModifiers) {
+    if (adultFee > 0) breakdown.push({ label: lang === 'en' ? 'Adult content (18+) (+20%)' : 'เนื้อหาสำหรับผู้ใหญ่ (+20%)', amount: adultFee });
+    if (live2dFee > 0) breakdown.push({ label: lang === 'en' ? 'Live2D part separation (+50%)' : 'แยกพาร์ต Live2D (+50%)', amount: live2dFee });
+    if (commercialFee > 0) breakdown.push({ label: lang === 'en' ? 'Commercial use (x2)' : 'สิทธิ์เชิงพาณิชย์ (×2)', amount: commercialFee });
+    if (rushFee > 0) breakdown.push({ label: labelFor(rush, lang), amount: rushFee });
+    if (sourceFileFee > 0) breakdown.push({ label: lang === 'en' ? 'PSD source file' : 'ไฟล์ PSD / Source File', amount: sourceFileFee });
+    if (riggingFee > 0) breakdown.push({ label: 'Rigging', amount: riggingFee });
+    if (extraPartsFee > 0) breakdown.push({ label: lang === 'en' ? `Extra parts x${input.extraPartsCount}` : `ชิ้นส่วนเพิ่ม ×${input.extraPartsCount}`, amount: extraPartsFee });
   }
 
   return {
-    workType,
-    base,
-    characterFee,
-    complexityFee,
-    backgroundFee,
-    artSubtotal,
-    adultFee,
-    live2dFee,
-    adjustedArt,
-    commercialFee,
-    rushFee,
-    sourceFileFee,
-    riggingFee,
-    extraPartsFee,
-    flatFees,
-    total,
-    low,
-    high,
-    deposit,
-    balance,
-    breakdown,
+    workType, base, characterFee, complexityFee, backgroundFee, artSubtotal, adultFee, live2dFee, adjustedArt,
+    commercialFee, rushFee, sourceFileFee, riggingFee, extraPartsFee, flatFees, total, low, high, deposit, balance, breakdown,
     labels: {
       workType: workType.label,
       colorMode: colorLabel,
@@ -241,5 +193,76 @@ export function calculatePrice(input: CalculatorInput, lang: PriceLanguage = 'th
       background: labelFor(background, lang),
       rush: labelFor(rush, lang),
     },
+  };
+}
+
+export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage): PriceResult {
+  const doujinPages = Math.max(1, input.doujinPages);
+  const innerSubtotal = doujinPages * DOUJIN_PAGE_PRICE_THB;
+  
+  const doujinWorkType = workTypes.find(w => w.id === 'doujin')!;
+  
+  const breakdown: BreakdownItem[] = [];
+  breakdown.push({
+    label: lang === 'en' ? `Doujin inner pages (x${doujinPages})` : `หน้าเนื้อหาโดจิน (×${doujinPages})`,
+    amount: innerSubtotal
+  });
+
+  let coverResult: PriceResult | null = null;
+  let coverArtSubtotal = 0;
+
+  if (input.wantCover) {
+    const coverInput = { ...input, workTypeId: input.coverScaleId };
+    coverResult = calculateIllustrationPrice(coverInput, lang, { includeGlobalModifiers: false });
+    coverArtSubtotal = coverResult.artSubtotal;
+    
+    // Prefix cover items
+    const prefix = lang === 'en' ? '[Cover] ' : '[ปก] ';
+    for (const item of coverResult.breakdown) {
+      breakdown.push({
+        label: `${prefix}${item.label}`,
+        amount: item.amount
+      });
+    }
+  }
+
+  // Combined art subtotal before global modifiers
+  const combinedArtSubtotal = innerSubtotal + coverArtSubtotal;
+  
+  // Global Modifiers applied to combined art subtotal
+  const adultFee = input.isAdult ? Math.round(combinedArtSubtotal * ADULT_RATE) : 0;
+  const adjustedArt = combinedArtSubtotal + adultFee;
+  const commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
+  
+  const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
+  const rushFee = rush.surcharge ?? 0;
+  const flatFees = rushFee;
+  
+  const total = adjustedArt + commercialFee + flatFees;
+
+  // Append global modifiers to breakdown
+  if (adultFee > 0) breakdown.push({ label: lang === 'en' ? 'Adult content (18+) (+20%)' : 'เนื้อหาสำหรับผู้ใหญ่ (+20%)', amount: adultFee });
+  if (commercialFee > 0) breakdown.push({ label: lang === 'en' ? 'Commercial use (x2)' : 'สิทธิ์เชิงพาณิชย์ (×2)', amount: commercialFee });
+  if (rushFee > 0) breakdown.push({ label: labelFor(rush, lang), amount: rushFee });
+
+  const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR)) / 10) * 10);
+  const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)) / 10) * 10;
+  const deposit = Math.min(total, Math.max(MINIMUM_DEPOSIT, input.depositAmount));
+  const balance = Math.max(0, total - deposit);
+
+  return {
+    workType: doujinWorkType,
+    base: innerSubtotal,
+    characterFee: 0, complexityFee: 0, backgroundFee: 0, artSubtotal: combinedArtSubtotal,
+    adultFee, live2dFee: 0, adjustedArt, commercialFee, rushFee,
+    sourceFileFee: 0, riggingFee: 0, extraPartsFee: 0, flatFees,
+    total, low, high, deposit, balance, breakdown,
+    labels: {
+      workType: doujinWorkType.label,
+      colorMode: 'B/W', // Cover color mode is included in the brief separately
+      complexity: coverResult ? coverResult.labels.complexity : '-',
+      background: coverResult ? coverResult.labels.background : '-',
+      rush: labelFor(rush, lang),
+    }
   };
 }

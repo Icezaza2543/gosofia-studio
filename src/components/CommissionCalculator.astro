@@ -55,6 +55,38 @@ import {
         </select>
       </div>
 
+      <div id="doujin-fields" class="hidden sm:col-span-2 grid sm:grid-cols-2 gap-4">
+        <div>
+          <label for="calc-doujin-pages" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.doujin.pages">จำนวนหน้า (ขาวดำเท่านั้น)</label>
+          <input
+            id="calc-doujin-pages"
+            type="number"
+            min="1"
+            value="1"
+            class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+          />
+        </div>
+        <div class="space-y-3 pt-1">
+          <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
+            <input type="checkbox" id="calc-want-cover" class="w-4.5 h-4.5 accent-primary" />
+            <span class="text-sm font-semibold text-ink" data-i18n="calc.main.doujin.cover">เพิ่มหน้าปก (คิดราคาตามภาพสเกลตัวละคร)</span>
+          </label>
+        </div>
+        <div id="cover-scale-field" class="hidden sm:col-span-2 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="calc-cover-scale" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.doujin.coverScale">สเกลหน้าปก</label>
+            <select
+              id="calc-cover-scale"
+              class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+            >
+              {workTypes.filter(wt => wt.id !== 'vtuber' && wt.id !== 'merch' && wt.id !== 'doujin').map((wt) => (
+                <option value={wt.id}>{wt.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div id="color-mode-field">
         <span class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.color">รูปแบบสี</span>
         <div class="grid grid-cols-2 gap-2">

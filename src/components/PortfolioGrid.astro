@@ -14,7 +14,7 @@ interface Props {
 const { sfwOnly = false, limit, featured = false } = Astro.props;
 
 let items: PortfolioItem[] = sfwOnly
-  ? portfolio.filter((item) => !item.isAdult && item.canShow)
+  ? portfolio.filter((item) => !item.isAdult && !item.isBlurred && item.canShow)
   : portfolio.filter((item) => item.canShow);
 
 if (limit) {
@@ -60,6 +60,7 @@ const showFilters = !sfwOnly;
       ]}
       data-categories={JSON.stringify(item.category)}
       data-is-adult={item.isAdult.toString()}
+      data-is-blurred={item.isBlurred?.toString()}
     >
       <PortfolioCard item={item} />
     </div>
@@ -75,22 +76,41 @@ const showFilters = !sfwOnly;
   <div class="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
     <div class="flex items-center justify-between px-4 py-3 border-b border-line">
       <h3 id="lightbox-title" class="font-bold text-ink truncate">Preview</h3>
-      <button
-        type="button"
-        id="lightbox-close"
-        class="w-9 h-9 rounded-lg border border-line bg-white hover:bg-secondary-light text-muted hover:text-primary transition-colors grid place-items-center"
-        aria-label="ปิด"
-      >
-        ✕
-      </button>
+      <div class="flex items-center gap-4">
+        <span id="lightbox-counter" class="text-sm font-semibold text-muted hidden">1 / 1</span>
+        <button
+          type="button"
+          id="lightbox-close"
+          class="w-9 h-9 rounded-lg border border-line bg-white hover:bg-secondary-light text-muted hover:text-primary transition-colors grid place-items-center"
+          aria-label="ปิด"
+        >
+          ✕
+        </button>
+      </div>
     </div>
-    <div class="flex-1 overflow-auto bg-secondary-light flex items-center justify-center p-4">
+    <div class="flex-1 relative overflow-auto bg-secondary-light flex items-center justify-center p-4 group/lightbox">
       <img
         id="lightbox-img"
         src=""
         alt=""
         class="max-w-full max-h-[75vh] object-contain rounded-lg"
       />
+      <button
+        type="button"
+        id="lightbox-prev"
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-primary transition-colors hidden opacity-0 group-hover/lightbox:opacity-100 focus:opacity-100"
+        aria-label="Previous"
+      >
+        ❮
+      </button>
+      <button
+        type="button"
+        id="lightbox-next"
+        class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-primary transition-colors hidden opacity-0 group-hover/lightbox:opacity-100 focus:opacity-100"
+        aria-label="Next"
+      >
+        ❯
+      </button>
     </div>
   </div>
 </div>
@@ -114,13 +134,14 @@ const showFilters = !sfwOnly;
       items.forEach((item) => {
         const categories: string[] = JSON.parse(item.dataset.categories || '[]');
         const isAdult = item.dataset.isAdult === 'true';
+        const isBlurred = item.dataset.isBlurred === 'true';
 
         if (filter === 'all') {
           item.style.display = '';
         } else if (filter === 'sfw') {
-          item.style.display = isAdult ? 'none' : '';
+          item.style.display = (isAdult || isBlurred) ? 'none' : '';
         } else if (filter === 'adult') {
-          item.style.display = isAdult ? '' : 'none';
+          item.style.display = (isAdult || isBlurred) ? '' : 'none';
         } else {
           item.style.display = categories.includes(filter!) ? '' : 'none';
         }
@@ -133,12 +154,50 @@ const showFilters = !sfwOnly;
   const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
   const lightboxTitle = document.getElementById('lightbox-title');
   const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxCounter = document.getElementById('lightbox-counter');
 
-  function openLightbox(title: string, imageSrc: string) {
+  let currentGallery: string[] = [];
+  let currentIndex = 0;
+  let currentIsAdult = false;
+  let currentTitle = '';
+
+  function updateLightboxImage() {
+    if (!lightboxImg) return;
+    const src = currentGallery[currentIndex];
+    lightboxImg.src = src;
+    lightboxImg.alt = currentTitle;
+    lightboxImg.onerror = () => {
+      lightboxImg.onerror = null;
+      lightboxImg.src = currentIsAdult ? '/images/portfolio/portfolio-r18-placeholder.png' : '/images/portfolio/portfolio-placeholder.png';
+    };
+
+    if (currentGallery.length > 1) {
+      if (lightboxCounter) {
+        lightboxCounter.textContent = `${currentIndex + 1} / ${currentGallery.length}`;
+        lightboxCounter.classList.remove('hidden');
+      }
+      if (lightboxPrev) lightboxPrev.classList.remove('hidden');
+      if (lightboxNext) lightboxNext.classList.remove('hidden');
+    } else {
+      if (lightboxCounter) lightboxCounter.classList.add('hidden');
+      if (lightboxPrev) lightboxPrev.classList.add('hidden');
+      if (lightboxNext) lightboxNext.classList.add('hidden');
+    }
+  }
+
+  function openLightbox(title: string, images: string[], isAdultOrBlurred: boolean = false) {
     if (!lightbox || !lightboxImg || !lightboxTitle) return;
+    
+    currentGallery = images;
+    currentIndex = 0;
+    currentIsAdult = isAdultOrBlurred;
+    currentTitle = title;
+    
     lightboxTitle.textContent = title;
-    lightboxImg.src = imageSrc;
-    lightboxImg.alt = title;
+    updateLightboxImage();
+
     lightbox.classList.remove('hidden');
     lightbox.classList.add('flex');
     lightbox.setAttribute('aria-hidden', 'false');
@@ -152,6 +211,21 @@ const showFilters = !sfwOnly;
     lightboxImg.src = '';
   }
 
+  function nextImage() {
+    if (currentGallery.length <= 1) return;
+    currentIndex = (currentIndex + 1) % currentGallery.length;
+    updateLightboxImage();
+  }
+
+  function prevImage() {
+    if (currentGallery.length <= 1) return;
+    currentIndex = (currentIndex - 1 + currentGallery.length) % currentGallery.length;
+    updateLightboxImage();
+  }
+
+  lightboxPrev?.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+  lightboxNext?.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+
   // Age gate check stored in sessionStorage
   function hasAgeConfirmation(): boolean {
     return sessionStorage.getItem('gosofia-age-confirmed') === 'true';
@@ -164,25 +238,36 @@ const showFilters = !sfwOnly;
   document.querySelectorAll<HTMLButtonElement>('.portfolio-card').forEach((card) => {
     card.addEventListener('click', () => {
       const isAdult = card.dataset.isAdult === 'true';
+      const isBlurred = card.dataset.isBlurred === 'true';
       const title = card.dataset.title || 'Preview';
-      const image = card.dataset.image || '';
+      
+      let gallery: string[] = [];
+      try {
+        if (card.dataset.gallery) {
+           gallery = JSON.parse(decodeURIComponent(card.dataset.gallery));
+        } else if (card.dataset.image) {
+           gallery = [card.dataset.image];
+        }
+      } catch (e) {
+        gallery = [card.dataset.image || ''];
+      }
 
-      if (isAdult) {
+      if (isAdult || isBlurred) {
         if (!hasAgeConfirmation()) {
           // Show age gate
           const ageGate = document.getElementById('age-gate-modal');
           if (ageGate) {
             ageGate.classList.remove('hidden');
             ageGate.classList.add('flex');
-            // Store which card to open after confirmation
             ageGate.dataset.pendingTitle = title;
-            ageGate.dataset.pendingImage = image;
+            ageGate.dataset.pendingGallery = encodeURIComponent(JSON.stringify(gallery));
+            ageGate.dataset.pendingAdult = (isAdult || isBlurred).toString();
           }
           return;
         }
       }
 
-      openLightbox(title, image);
+      openLightbox(title, gallery, isAdult || isBlurred);
     });
   });
 
@@ -191,7 +276,10 @@ const showFilters = !sfwOnly;
     if (e.target === lightbox) closeLightbox();
   });
   document.addEventListener('keydown', (e) => {
+    if (lightbox?.classList.contains('hidden')) return;
     if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
   });
 
   // Age gate confirm handler
@@ -203,10 +291,17 @@ const showFilters = !sfwOnly;
     setAgeConfirmation();
     if (ageGateModal) {
       const title = ageGateModal.dataset.pendingTitle || '';
-      const image = ageGateModal.dataset.pendingImage || '';
+      const galleryStr = ageGateModal.dataset.pendingGallery || '';
+      const isAdult = ageGateModal.dataset.pendingAdult === 'true';
       ageGateModal.classList.add('hidden');
       ageGateModal.classList.remove('flex');
-      if (title && image) openLightbox(title, image);
+      
+      let gallery: string[] = [];
+      try {
+        if (galleryStr) gallery = JSON.parse(decodeURIComponent(galleryStr));
+      } catch (e) {}
+
+      if (title && gallery.length > 0) openLightbox(title, gallery, isAdult);
     }
   });
 

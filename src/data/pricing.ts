@@ -82,6 +82,16 @@ export const workTypes: WorkTypeConfig[] = [
     adultAvailable: true,
     estimatedDays: [15, 20],
   },
+  {
+    id: 'doujin',
+    label: 'Doujin Commission',
+    labelTh: 'รับวาดโดจิน',
+    bw: null, // Doujin inner pages are dynamically calculated based on pages
+    color: null as any, // Not applicable, color/bw is determined by cover
+    hasColorChoice: false, // Color choice is tied to the cover, not the base Doujin type
+    adultAvailable: true,
+    estimatedDays: [15, 45],
+  },
 ];
 
 export interface ComplexityOption {
@@ -142,6 +152,9 @@ export const LIVE2D_RATE = 0.5;
 export const COMMERCIAL_MULTIPLIER = 2;
 
 // ─── Flat add-on prices ───
+
+/** Doujin page price */
+export const DOUJIN_PAGE_PRICE_THB = 450;
 
 /** Source file / PSD — only available for Vtuber model */
 export const SOURCE_FILE_PRICE = 4000;

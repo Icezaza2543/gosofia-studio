@@ -14,8 +14,8 @@ import { artist } from '../data/artist';
 
   <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-extrabold text-ink">💬 ติดต่อ / Contact</h1>
-      <p class="text-muted mt-2">ส่งบรีฟมาคุยรายละเอียดงานกันได้เลย!</p>
+      <h1 class="text-3xl font-extrabold text-ink" data-i18n="contact.page.title">💬 ติดต่อ / Contact</h1>
+      <p class="text-muted mt-2" data-i18n="contact.page.desc">ส่งบรีฟมาคุยรายละเอียดงานกันได้เลย!</p>
     </div>
 
     <!-- Primary CTA: Copy Brief -->
@@ -23,15 +23,16 @@ import { artist } from '../data/artist';
       <div class="flex items-start gap-4">
         <div class="text-4xl">📋</div>
         <div>
-          <h2 class="text-xl font-bold text-ink mb-2">วิธีส่งบรีฟที่แนะนำ</h2>
+          <h2 class="text-xl font-bold text-ink mb-2" data-i18n="contact.method.title">วิธีส่งบรีฟที่แนะนำ</h2>
           <ol class="space-y-2 text-base text-muted leading-relaxed">
-            <li>1. ใช้ <a href="/calculator/" class="text-primary font-semibold hover:underline">เครื่องคำนวณราคา</a> เพื่อประเมินราคาและสร้างบรีฟอัตโนมัติ</li>
-            <li>2. กด "คัดลอกบรีฟ" เพื่อคัดลอกข้อมูลทั้งหมด</li>
-            <li>3. ส่งบรีฟผ่านช่องทางที่สะดวก (Discord, X/Twitter, Email)</li>
+            <li data-i18n="contact.method.step1" data-i18n-html>1. ใช้ <a href="/calculator/" class="text-primary font-semibold hover:underline">เครื่องคำนวณราคา</a> เพื่อประเมินราคาและสร้างบรีฟอัตโนมัติ</li>
+            <li data-i18n="contact.method.step2">2. กด "คัดลอกบรีฟ" เพื่อคัดลอกข้อมูลทั้งหมด</li>
+            <li data-i18n="contact.method.step3">3. ส่งบรีฟผ่านช่องทางที่สะดวก (X/Twitter, Email)</li>
           </ol>
           <a
             href="/calculator/"
             class="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-light transition-colors shadow-lg shadow-primary/20"
+            data-i18n="contact.method.cta"
           >
             🧮 ไปคำนวณราคาและสร้างบรีฟ
           </a>
@@ -41,19 +42,19 @@ import { artist } from '../data/artist';
 
     <!-- Social Links -->
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-ink mb-4">📱 ช่องทางติดต่อทั้งหมด</h2>
+      <h2 class="text-xl font-bold text-ink mb-4" data-i18n="contact.all.title">📱 ช่องทางติดต่อทั้งหมด</h2>
       <SocialLinks />
     </div>
 
     <!-- Artist Info -->
     <div class="rounded-2xl border border-line bg-white p-6">
-      <h2 class="text-lg font-bold text-ink mb-3">เกี่ยวกับ {artist.name}</h2>
-      <p class="text-base text-muted leading-relaxed mb-4">{artist.bio}</p>
+      <h2 class="text-lg font-bold text-ink mb-3"><span data-i18n="contact.about.title">เกี่ยวกับ</span> {artist.name}</h2>
+      <p class="text-base text-muted leading-relaxed mb-4" data-i18n="contact.about.bio">{artist.bio}</p>
       <div class="flex flex-wrap gap-2">
-        <span class="px-3 py-1 rounded-full bg-secondary-light text-sm font-semibold text-primary/70 border border-secondary-dark/20">
+        <span class="px-3 py-1 rounded-full bg-secondary-light text-sm font-semibold text-primary/70 border border-secondary-dark/20" data-i18n="contact.exp">
           🎨 ประสบการณ์ {artist.yearsExperience} ปี
         </span>
-        <span class="px-3 py-1 rounded-full bg-secondary-light text-sm font-semibold text-primary/70 border border-secondary-dark/20">
+        <span class="px-3 py-1 rounded-full bg-secondary-light text-sm font-semibold text-primary/70 border border-secondary-dark/20" data-i18n="contact.count">
           ✅ Commission {artist.commissionCount}+ ครั้ง
         </span>
       </div>

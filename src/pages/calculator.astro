@@ -40,6 +40,11 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
   // ─── DOM references ───
   const els = {
     workType: document.getElementById('calc-work-type') as HTMLSelectElement,
+    doujinFields: document.getElementById('doujin-fields') as HTMLElement,
+    doujinPages: document.getElementById('calc-doujin-pages') as HTMLInputElement,
+    wantCover: document.getElementById('calc-want-cover') as HTMLInputElement,
+    coverScaleField: document.getElementById('cover-scale-field') as HTMLElement,
+    coverScale: document.getElementById('calc-cover-scale') as HTMLSelectElement,
     colorField: document.getElementById('color-mode-field') as HTMLElement,
     characters: document.getElementById('calc-characters') as HTMLInputElement,
     complexity: document.getElementById('calc-complexity') as HTMLSelectElement,
@@ -147,6 +152,9 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       wantRigging: els.rigging.checked,
       extraPartsCount: Number(els.extraParts.value) || 0,
       depositAmount: lang === 'en' ? usdToThb(depositAmount) : depositAmount,
+      doujinPages: Number(els.doujinPages.value) || 1,
+      wantCover: els.wantCover.checked,
+      coverScaleId: els.coverScale.value,
     };
   }
 
@@ -160,8 +168,28 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     const result = calculatePrice(input, lang);
     const wt = workTypes.find(w => w.id === input.workTypeId);
 
+    // Toggle Doujin fields
+    const isDoujin = input.workTypeId === 'doujin';
+    if (isDoujin) {
+      els.doujinFields.classList.remove('hidden');
+      if (input.wantCover) {
+        els.coverScaleField.classList.remove('hidden');
+        els.coverScaleField.classList.add('grid');
+      } else {
+        els.coverScaleField.classList.add('hidden');
+        els.coverScaleField.classList.remove('grid');
+      }
+    } else {
+      els.doujinFields.classList.add('hidden');
+    }
+
     // Toggle color mode visibility
-    if (wt && !wt.hasColorChoice) {
+    // Hide color mode if the worktype has no color choice, OR if it's a doujin with NO cover.
+    // If doujin with cover, the color mode applies to the cover.
+    const isCoverSelected = isDoujin && input.wantCover;
+    const activeWorkType = isCoverSelected ? workTypes.find(w => w.id === input.coverScaleId) : wt;
+    
+    if ((activeWorkType && !activeWorkType.hasColorChoice) || (isDoujin && !input.wantCover)) {
       els.colorField.style.display = 'none';
     } else {
       els.colorField.style.display = '';
@@ -177,8 +205,8 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       els.adultConfirm.checked = false;
     }
 
-    // Disable live2d for vtuber
-    if (wt?.id === 'vtuber') {
+    // Disable live2d for vtuber and doujin
+    if (wt?.id === 'vtuber' || isDoujin) {
       els.live2d.checked = false;
       els.live2d.disabled = true;
     } else {
@@ -191,6 +219,17 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       els.sourceFile.disabled = true;
     } else {
       els.sourceFile.disabled = false;
+    }
+    
+    // Disable rigging/extra parts for non-vtuber
+    if (wt?.id !== 'vtuber') {
+      els.rigging.checked = false;
+      els.rigging.disabled = true;
+      els.extraParts.value = '0';
+      els.extraParts.disabled = true;
+    } else {
+      els.rigging.disabled = false;
+      els.extraParts.disabled = false;
     }
 
     // Update total
@@ -230,7 +269,7 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
   }
 
   // ─── Event listeners ───
-  document.querySelectorAll<HTMLElement>('#calc-work-type, #calc-characters, #calc-complexity, #calc-background, #calc-rush, #calc-commercial, #calc-live2d, #calc-adult, #calc-adult-confirm, #calc-rigging, #calc-source-file, #calc-extra-parts, #calc-deposit, #calc-notes, #calc-project-title, #calc-client-name').forEach(el => {
+  document.querySelectorAll<HTMLElement>('#calc-work-type, #calc-doujin-pages, #calc-want-cover, #calc-cover-scale, #calc-characters, #calc-complexity, #calc-background, #calc-rush, #calc-commercial, #calc-live2d, #calc-adult, #calc-adult-confirm, #calc-rigging, #calc-source-file, #calc-extra-parts, #calc-deposit, #calc-notes, #calc-project-title, #calc-client-name').forEach(el => {
     el.addEventListener('input', render);
     el.addEventListener('change', render);
   });
@@ -263,6 +302,9 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
   // Reset
   els.resetBtn.addEventListener('click', () => {
     els.workType.value = 'headshot';
+    els.doujinPages.value = '1';
+    els.wantCover.checked = false;
+    els.coverScale.value = 'headshot';
     (document.querySelector<HTMLInputElement>('input[name="calc-color"][value="color"]'))!.checked = true;
     els.characters.value = '1';
     els.complexity.value = 'normal';

@@ -9,11 +9,49 @@ const { compact = false } = Astro.props;
 ---
 
 <div class:list={['flex flex-wrap', compact ? 'gap-2' : 'gap-3']}>
+  <!-- Copy Email Button -->
+  <button
+    type="button"
+    class:list={[
+      'relative inline-flex items-center gap-2 font-semibold rounded-xl border transition-all cursor-pointer text-left',
+      compact
+        ? 'px-3 py-2 text-sm border-line bg-white text-muted hover:text-primary hover:bg-secondary-light hover:border-primary/20'
+        : 'px-5 py-3 text-base border-line bg-white text-muted hover:text-primary hover:bg-secondary hover:border-primary/30 shadow-sm hover:shadow-md',
+    ]}
+    onclick="const btn = this; navigator.clipboard.writeText('gosofiade@gmail.com').then(() => { const t = btn.querySelector('.email-toast'); t.classList.remove('opacity-0'); setTimeout(() => t.classList.add('opacity-0'), 2000) }).catch(() => { alert('gosofiade@gmail.com') })"
+    id="social-email-copy"
+  >
+    <span class="flex-shrink-0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    </span>
+    <span data-i18n="social.email.copybtn">คัดลอกอีเมล</span>
+    <span class="email-toast absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-ink text-white text-xs rounded-md opacity-0 transition-opacity whitespace-nowrap pointer-events-none shadow-lg z-10" data-i18n="social.email.copied">คัดลอกอีเมลแล้ว: gosofiade@gmail.com</span>
+  </button>
+
+  <!-- Open in Gmail Button -->
+  <a
+    href="https://mail.google.com/mail/?view=cm&fs=1&to=gosofiade@gmail.com&su=Commission%20Inquiry"
+    target="_blank"
+    rel="noopener noreferrer"
+    class:list={[
+      'inline-flex items-center gap-2 font-semibold rounded-xl border transition-all',
+      compact
+        ? 'px-3 py-2 text-sm border-line bg-white text-muted hover:text-primary hover:bg-secondary-light hover:border-primary/20'
+        : 'px-5 py-3 text-base border-line bg-white text-muted hover:text-primary hover:bg-secondary hover:border-primary/30 shadow-sm hover:shadow-md',
+    ]}
+    id="social-email-gmail"
+  >
+    <span class="flex-shrink-0">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+    </span>
+    <span data-i18n="social.email.gmail">เปิดใน Gmail</span>
+  </a>
+
   {socials.map((social) => (
     <a
       href={social.url}
-      target={social.platform === 'email' ? undefined : '_blank'}
-      rel={social.platform === 'email' ? undefined : 'noopener noreferrer'}
+      target="_blank"
+      rel="noopener noreferrer"
       class:list={[
         'inline-flex items-center gap-2 font-semibold rounded-xl border transition-all',
         compact
@@ -27,3 +65,4 @@ const { compact = false } = Astro.props;
     </a>
   ))}
 </div>
+

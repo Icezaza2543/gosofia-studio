@@ -13,8 +13,8 @@ import TermsSection from '../components/TermsSection.astro';
 
   <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
     <div class="mb-8">
-      <h1 class="text-3xl font-extrabold text-ink">📋 เงื่อนไขการจ้าง / Terms of Service</h1>
-      <p class="text-muted mt-2">กรุณาอ่านเงื่อนไขก่อนส่งบรีฟ — เพื่อให้ทั้งสองฝ่ายเข้าใจตรงกัน</p>
+      <h1 class="text-3xl font-extrabold text-ink" data-i18n="terms.page.title">📋 เงื่อนไขการจ้าง</h1>
+      <p class="text-muted mt-2" data-i18n="terms.page.desc">กรุณาอ่านเงื่อนไขก่อนส่งบรีฟ — เพื่อให้ทั้งสองฝ่ายเข้าใจตรงกัน</p>
     </div>
 
     <div class="rounded-2xl border border-line bg-white shadow-lg p-6 sm:p-8">
@@ -26,7 +26,7 @@ import TermsSection from '../components/TermsSection.astro';
         href="/calculator/"
         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-light transition-colors shadow-lg shadow-primary/20"
       >
-        🧮 คำนวณราคาและส่งบรีฟ
+        <span data-i18n="terms.cta">🧮 คำนวณราคาและส่งบรีฟ</span>
       </a>
     </div>
   </main>
