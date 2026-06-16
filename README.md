@@ -13,10 +13,10 @@
 </p>
 
 <p align="center">
-  <a href="https://astro.build/">Astro</a> ·
-  <a href="https://tailwindcss.com/">Tailwind CSS</a> ·
-  TypeScript ·
-  Static Deployment
+  <a href="https://astro.build/"><img src="https://img.shields.io/badge/Astro-0C151C?style=for-the-badge&logo=astro&logoColor=white" alt="Astro" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" /></a>
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <a href="https://vercel.com/icezaza2543s-projects/gosofia-artwork/deployments"><img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" /></a>
 </p>
 
 ---
