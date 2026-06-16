@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PortfolioGrid from '../components/PortfolioGrid.astro';
+import AgeGateModal from '../components/AgeGateModal.astro';
+---
+
+<BaseLayout
+  title="ผลงาน"
+  description="ผลงานวาดของ Gosofia — Character Art, Vtuber Model, Merch Illustration และอื่น ๆ"
+>
+  <SiteHeader />
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-ink" data-i18n="portfolio.title">🎨 ผลงาน / Portfolio</h1>
+      <p class="text-muted mt-2" data-i18n="portfolio.desc">เลือกหมวดหมู่เพื่อกรองผลงาน — ภาพ 18+ จะถูกเบลอไว้จนกว่าจะยืนยันอายุ</p>
+    </div>
+
+    <PortfolioGrid />
+  </main>
+
+  <AgeGateModal />
+  <SiteFooter />
+</BaseLayout>

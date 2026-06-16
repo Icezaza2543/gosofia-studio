@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gosofia-studio.vercel.app/sitemap-index.xml

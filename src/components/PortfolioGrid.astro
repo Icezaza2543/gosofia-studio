@@ -1,0 +1,203 @@
+---
+import PortfolioCard from './PortfolioCard.astro';
+import { portfolio, portfolioFilters, type PortfolioItem } from '../data/portfolio';
+
+interface Props {
+  /** Only show SFW items (for homepage) */
+  sfwOnly?: boolean;
+  /** Limit the number of items shown */
+  limit?: number;
+}
+
+const { sfwOnly = false, limit } = Astro.props;
+
+let items: PortfolioItem[] = sfwOnly
+  ? portfolio.filter((item) => !item.isAdult && item.canShow)
+  : portfolio.filter((item) => item.canShow);
+
+if (limit) {
+  items = items.slice(0, limit);
+}
+
+const showFilters = !sfwOnly;
+---
+
+{showFilters && (
+  <div class="flex flex-wrap gap-2 mb-6" id="portfolio-filters" role="toolbar" aria-label="กรองผลงาน">
+    {portfolioFilters.map((filter) => (
+      <button
+        type="button"
+        class:list={[
+          'filter-btn px-4 py-2 rounded-full text-sm font-semibold border transition-all',
+          filter.id === 'all'
+            ? 'bg-secondary text-primary border-primary/20'
+            : 'bg-white text-muted border-line hover:text-primary hover:bg-secondary-light hover:border-primary/20',
+        ]}
+        data-filter={filter.id}
+        data-i18n={`portfolio.filter.${filter.id}`}
+      >
+        {filter.label}
+      </button>
+    ))}
+  </div>
+)}
+
+<div class="columns-1 sm:columns-2 lg:columns-3 gap-4" id="portfolio-grid">
+  {items.map((item) => (
+    <div class="portfolio-item" data-categories={JSON.stringify(item.category)} data-is-adult={item.isAdult.toString()}>
+      <PortfolioCard item={item} />
+    </div>
+  ))}
+</div>
+
+<!-- Lightbox -->
+<div
+  id="portfolio-lightbox"
+  class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+  aria-hidden="true"
+>
+  <div class="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-line">
+      <h3 id="lightbox-title" class="font-bold text-ink truncate">Preview</h3>
+      <button
+        type="button"
+        id="lightbox-close"
+        class="w-9 h-9 rounded-lg border border-line bg-white hover:bg-secondary-light text-muted hover:text-primary transition-colors grid place-items-center"
+        aria-label="ปิด"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="flex-1 overflow-auto bg-secondary-light flex items-center justify-center p-4">
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        class="max-w-full max-h-[75vh] object-contain rounded-lg"
+      />
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Portfolio Filtering ───
+  const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const items = document.querySelectorAll<HTMLElement>('.portfolio-item');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      filterBtns.forEach((b) => {
+        b.classList.remove('bg-secondary', 'text-primary', 'border-primary/20');
+        b.classList.add('bg-white', 'text-muted', 'border-line');
+      });
+      btn.classList.remove('bg-white', 'text-muted', 'border-line');
+      btn.classList.add('bg-secondary', 'text-primary', 'border-primary/20');
+
+      items.forEach((item) => {
+        const categories: string[] = JSON.parse(item.dataset.categories || '[]');
+        const isAdult = item.dataset.isAdult === 'true';
+
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'sfw') {
+          item.style.display = isAdult ? 'none' : '';
+        } else if (filter === 'adult') {
+          item.style.display = isAdult ? '' : 'none';
+        } else {
+          item.style.display = categories.includes(filter!) ? '' : 'none';
+        }
+      });
+    });
+  });
+
+  // ─── Lightbox ───
+  const lightbox = document.getElementById('portfolio-lightbox');
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lightboxTitle = document.getElementById('lightbox-title');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  function openLightbox(title: string, imageSrc: string) {
+    if (!lightbox || !lightboxImg || !lightboxTitle) return;
+    lightboxTitle.textContent = title;
+    lightboxImg.src = imageSrc;
+    lightboxImg.alt = title;
+    lightbox.classList.remove('hidden');
+    lightbox.classList.add('flex');
+    lightbox.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeLightbox() {
+    if (!lightbox || !lightboxImg) return;
+    lightbox.classList.add('hidden');
+    lightbox.classList.remove('flex');
+    lightbox.setAttribute('aria-hidden', 'true');
+    lightboxImg.src = '';
+  }
+
+  // Age gate check stored in sessionStorage
+  function hasAgeConfirmation(): boolean {
+    return sessionStorage.getItem('gosofia-age-confirmed') === 'true';
+  }
+
+  function setAgeConfirmation() {
+    sessionStorage.setItem('gosofia-age-confirmed', 'true');
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.portfolio-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const isAdult = card.dataset.isAdult === 'true';
+      const title = card.dataset.title || 'Preview';
+      const image = card.dataset.image || '';
+
+      if (isAdult) {
+        if (!hasAgeConfirmation()) {
+          // Show age gate
+          const ageGate = document.getElementById('age-gate-modal');
+          if (ageGate) {
+            ageGate.classList.remove('hidden');
+            ageGate.classList.add('flex');
+            // Store which card to open after confirmation
+            ageGate.dataset.pendingTitle = title;
+            ageGate.dataset.pendingImage = image;
+          }
+          return;
+        }
+      }
+
+      openLightbox(title, image);
+    });
+  });
+
+  lightboxClose?.addEventListener('click', closeLightbox);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // Age gate confirm handler
+  const ageGateConfirm = document.getElementById('age-gate-confirm');
+  const ageGateCancel = document.getElementById('age-gate-cancel');
+  const ageGateModal = document.getElementById('age-gate-modal');
+
+  ageGateConfirm?.addEventListener('click', () => {
+    setAgeConfirmation();
+    if (ageGateModal) {
+      const title = ageGateModal.dataset.pendingTitle || '';
+      const image = ageGateModal.dataset.pendingImage || '';
+      ageGateModal.classList.add('hidden');
+      ageGateModal.classList.remove('flex');
+      if (title && image) openLightbox(title, image);
+    }
+  });
+
+  ageGateCancel?.addEventListener('click', () => {
+    if (ageGateModal) {
+      ageGateModal.classList.add('hidden');
+      ageGateModal.classList.remove('flex');
+    }
+  });
+</script>

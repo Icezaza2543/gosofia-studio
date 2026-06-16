@@ -1,0 +1,54 @@
+---
+import { socials } from '../data/socials';
+import { artist } from '../data/artist';
+---
+
+<footer class="mt-auto border-t border-line bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Brand -->
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-md bg-primary text-white font-extrabold text-sm grid place-items-center">G</div>
+          <span class="text-lg font-bold text-primary">{artist.name}</span>
+        </div>
+        <p class="text-sm text-muted leading-relaxed" data-i18n="footer.bio">{artist.bioShort}</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h3 class="text-sm font-bold text-ink mb-3" data-i18n="footer.quicklinks">ลิงก์ด่วน</h3>
+        <div class="grid gap-2">
+          <a href="/portfolio/" class="text-sm text-muted hover:text-primary transition-colors" data-i18n="nav./portfolio/">ผลงาน</a>
+          <a href="/calculator/" class="text-sm text-muted hover:text-primary transition-colors" data-i18n="nav./calculator/">คำนวณราคา</a>
+          <a href="/terms/" class="text-sm text-muted hover:text-primary transition-colors" data-i18n="nav./terms/">เงื่อนไขการจ้าง</a>
+          <a href="/contact/" class="text-sm text-muted hover:text-primary transition-colors" data-i18n="nav./contact/">ติดต่อ</a>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div>
+        <h3 class="text-sm font-bold text-ink mb-3" data-i18n="footer.socials">ช่องทางติดต่อ</h3>
+        <div class="flex flex-wrap gap-2">
+          {socials.map((social) => (
+            <a
+              href={social.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-9 h-9 rounded-lg border border-line bg-surface hover:bg-secondary hover:border-primary/20 text-muted hover:text-primary transition-all grid place-items-center"
+              title={social.label}
+            >
+              <Fragment set:html={social.icon} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="mt-8 pt-6 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-muted">© 2024–{new Date().getFullYear()} {artist.name}. <span data-i18n="footer.rights">All rights reserved.</span></p>
+      <p class="text-xs text-muted" data-i18n="footer.credit">สร้างด้วย ♥ สำหรับศิลปินอิสระ</p>
+    </div>
+  </div>
+</footer>

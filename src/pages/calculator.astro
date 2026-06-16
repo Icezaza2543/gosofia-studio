@@ -1,0 +1,222 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import CommissionCalculator from '../components/CommissionCalculator.astro';
+import PriceBreakdown from '../components/PriceBreakdown.astro';
+---
+
+<BaseLayout
+  title="คำนวณราคา Commission"
+  description="คำนวณราคา Commission เบื้องต้น เลือกประเภทงาน ดีเทล ฉาก และตัวเลือกเสริมต่าง ๆ พร้อมสร้างบรีฟอัตโนมัติ"
+>
+  <SiteHeader />
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-ink" data-i18n="calc.page.title">🧮 คำนวณราคา Commission</h1>
+      <p class="text-muted mt-2" data-i18n="calc.page.desc">ประเมินราคาเบื้องต้น — เลือกตัวเลือกแล้วคัดลอกบรีฟส่งมาคุยได้เลย</p>
+    </div>
+
+    <div class="grid lg:grid-cols-[1.4fr_0.8fr] gap-6 items-start">
+      <CommissionCalculator />
+      <PriceBreakdown />
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<script>
+  // ─── Calculator Client-Side Logic ───
+  // Imports the pure calculation function and wires it to the UI
+
+  import { calculatePrice, type CalculatorInput } from '../lib/calculatePrice';
+  import { buildBrief } from '../lib/buildBrief';
+  import { formatMoney } from '../lib/formatMoney';
+  import { workTypes } from '../data/pricing';
+
+  // ─── DOM references ───
+  const els = {
+    workType: document.getElementById('calc-work-type') as HTMLSelectElement,
+    colorField: document.getElementById('color-mode-field') as HTMLElement,
+    characters: document.getElementById('calc-characters') as HTMLInputElement,
+    complexity: document.getElementById('calc-complexity') as HTMLSelectElement,
+    background: document.getElementById('calc-background') as HTMLSelectElement,
+    rush: document.getElementById('calc-rush') as HTMLSelectElement,
+    commercial: document.getElementById('calc-commercial') as HTMLInputElement,
+    live2d: document.getElementById('calc-live2d') as HTMLInputElement,
+    adult: document.getElementById('calc-adult') as HTMLInputElement,
+    adultConfirm: document.getElementById('calc-adult-confirm') as HTMLInputElement,
+    adultConfirmRow: document.getElementById('adult-confirm-row') as HTMLElement,
+    rigging: document.getElementById('calc-rigging') as HTMLInputElement,
+    sourceFile: document.getElementById('calc-source-file') as HTMLInputElement,
+    extraParts: document.getElementById('calc-extra-parts') as HTMLInputElement,
+    deposit: document.getElementById('calc-deposit') as HTMLInputElement,
+    notes: document.getElementById('calc-notes') as HTMLTextAreaElement,
+    projectTitle: document.getElementById('calc-project-title') as HTMLInputElement,
+    clientName: document.getElementById('calc-client-name') as HTMLInputElement,
+    // Output
+    total: document.getElementById('calc-total') as HTMLElement,
+    range: document.getElementById('calc-range') as HTMLElement,
+    breakdown: document.getElementById('calc-breakdown') as HTMLElement,
+    briefPreview: document.getElementById('brief-preview') as HTMLElement,
+    copyBtn: document.getElementById('copy-brief-btn') as HTMLButtonElement,
+    resetBtn: document.getElementById('reset-calc-btn') as HTMLButtonElement,
+    policyGuard: document.getElementById('policy-guard') as HTMLElement,
+    vtuberOptions: document.getElementById('vtuber-options') as HTMLElement,
+  };
+
+  function getSelectedColor(): 'bw' | 'color' {
+    const checked = document.querySelector<HTMLInputElement>('input[name="calc-color"]:checked');
+    return (checked?.value === 'bw') ? 'bw' : 'color';
+  }
+
+  function getInput(): CalculatorInput {
+    return {
+      workTypeId: els.workType.value,
+      colorMode: getSelectedColor(),
+      characterCount: Number(els.characters.value) || 1,
+      complexityId: els.complexity.value,
+      backgroundId: els.background.value,
+      isCommercial: els.commercial.checked,
+      isAdult: els.adult.checked,
+      adultConfirmed: els.adultConfirm.checked,
+      isLive2D: els.live2d.checked,
+      rushId: els.rush.value,
+      wantSourceFile: els.sourceFile.checked,
+      wantRigging: els.rigging.checked,
+      extraPartsCount: Number(els.extraParts.value) || 0,
+      depositAmount: Number(els.deposit.value) || 300,
+    };
+  }
+
+  function render() {
+    const input = getInput();
+    const result = calculatePrice(input);
+    const wt = workTypes.find(w => w.id === input.workTypeId);
+
+    // Toggle color mode visibility
+    if (wt && !wt.hasColorChoice) {
+      els.colorField.style.display = 'none';
+    } else {
+      els.colorField.style.display = '';
+    }
+
+    // Toggle adult confirm row
+    if (input.isAdult) {
+      els.adultConfirmRow.classList.remove('hidden');
+      els.adultConfirmRow.classList.add('flex');
+    } else {
+      els.adultConfirmRow.classList.add('hidden');
+      els.adultConfirmRow.classList.remove('flex');
+      els.adultConfirm.checked = false;
+    }
+
+    // Disable live2d for vtuber
+    if (wt?.id === 'vtuber') {
+      els.live2d.checked = false;
+      els.live2d.disabled = true;
+    } else {
+      els.live2d.disabled = false;
+    }
+
+    // Toggle source file availability
+    if (wt?.id !== 'vtuber') {
+      els.sourceFile.checked = false;
+      els.sourceFile.disabled = true;
+    } else {
+      els.sourceFile.disabled = false;
+    }
+
+    // Update total
+    els.total.textContent = formatMoney(result.total);
+    els.range.textContent = `${formatMoney(result.low)} – ${formatMoney(result.high)} หลังดูบรีฟจริง`;
+
+    // Update breakdown
+    els.breakdown.innerHTML = result.breakdown
+      .map(item => `<li class="flex justify-between gap-3 py-2.5 text-sm"><span class="text-muted">${item.label}</span><strong class="text-ink whitespace-nowrap">${formatMoney(item.amount)}</strong></li>`)
+      .join('');
+
+    // Policy guard
+    const blockedByPolicy = input.isAdult && !input.adultConfirmed;
+    els.copyBtn.disabled = blockedByPolicy;
+
+    if (blockedByPolicy) {
+      els.policyGuard.className = 'mt-3 p-3 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-800 leading-relaxed';
+      els.policyGuard.textContent = 'งานสำหรับผู้ใหญ่ต้องยืนยันว่าตัวละครทุกตัวเป็น 18+ ก่อนคัดลอกบรีฟ';
+    } else {
+      els.policyGuard.className = 'mt-3 p-3 rounded-xl border border-green-200 bg-green-50 text-sm text-green-800 leading-relaxed';
+      els.policyGuard.textContent = 'ระบบนี้ใช้ประเมินราคาเบื้องต้น ราคาอาจปรับเปลี่ยนได้หลังดูบรีฟจริง';
+    }
+
+    // Build brief
+    const brief = buildBrief(
+      {
+        projectTitle: els.projectTitle.value,
+        clientName: els.clientName.value,
+        notes: els.notes.value,
+        isAdult: input.isAdult,
+        adultConfirmed: input.adultConfirmed,
+      },
+      result
+    );
+    els.briefPreview.textContent = brief || 'ยืนยันนโยบายผู้ใหญ่เพื่อดูบรีฟ';
+  }
+
+  // ─── Event listeners ───
+  document.querySelectorAll<HTMLElement>('#calc-work-type, #calc-characters, #calc-complexity, #calc-background, #calc-rush, #calc-commercial, #calc-live2d, #calc-adult, #calc-adult-confirm, #calc-rigging, #calc-source-file, #calc-extra-parts, #calc-deposit, #calc-notes, #calc-project-title, #calc-client-name').forEach(el => {
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  document.querySelectorAll<HTMLInputElement>('input[name="calc-color"]').forEach(el => {
+    el.addEventListener('change', render);
+  });
+
+  // Copy brief
+  els.copyBtn.addEventListener('click', async () => {
+    if (els.copyBtn.disabled) return;
+    const text = els.briefPreview.textContent || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      els.copyBtn.textContent = '✓ คัดลอกแล้ว!';
+      setTimeout(() => { els.copyBtn.textContent = 'คัดลอกบรีฟ'; }, 1500);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      els.copyBtn.textContent = '✓ คัดลอกแล้ว!';
+      setTimeout(() => { els.copyBtn.textContent = 'คัดลอกบรีฟ'; }, 1500);
+    }
+  });
+
+  // Reset
+  els.resetBtn.addEventListener('click', () => {
+    els.workType.value = 'headshot';
+    (document.querySelector<HTMLInputElement>('input[name="calc-color"][value="color"]'))!.checked = true;
+    els.characters.value = '1';
+    els.complexity.value = 'normal';
+    els.background.value = 'none';
+    els.rush.value = 'normal';
+    els.commercial.checked = false;
+    els.live2d.checked = false;
+    els.adult.checked = false;
+    els.adultConfirm.checked = false;
+    els.rigging.checked = false;
+    els.sourceFile.checked = false;
+    els.extraParts.value = '0';
+    els.deposit.value = '300';
+    els.notes.value = '';
+    els.projectTitle.value = 'Commission artwork';
+    els.clientName.value = '';
+    render();
+  });
+
+  // Initial render
+  render();
+</script>

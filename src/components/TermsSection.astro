@@ -1,0 +1,19 @@
+---
+import { terms } from '../data/terms';
+---
+
+<div class="space-y-8">
+  {terms.map((section) => (
+    <div id={section.id} class="scroll-mt-20">
+      <h2 class="text-xl font-bold text-ink mb-4">{section.title}</h2>
+      <ul class="space-y-2">
+        {section.content.map((line) => (
+          <li class="flex gap-3 text-base text-muted leading-relaxed">
+            <span class="text-primary/40 mt-1 flex-shrink-0">•</span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>

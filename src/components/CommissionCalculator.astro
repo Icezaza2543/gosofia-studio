@@ -1,0 +1,214 @@
+---
+import { workTypes, complexityOptions, backgroundOptions, rushOptions } from '../data/pricing';
+---
+
+<section class="rounded-2xl border border-line bg-white shadow-lg p-5 sm:p-6" aria-label="ตัวเลือกราคา">
+  <!-- Project Info -->
+  <div class="mb-6">
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.info.title">📝 ข้อมูลโปรเจกต์</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="calc-project-title" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.info.project">ชื่องาน / ชื่อตัวละคร</label>
+        <input
+          id="calc-project-title"
+          type="text"
+          value="Commission artwork"
+          placeholder="เช่น OC portrait / Vtuber model"
+          data-i18n="calc.info.project.placeholder"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        />
+      </div>
+      <div>
+        <label for="calc-client-name" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.info.client">ชื่อลูกค้า</label>
+        <input
+          id="calc-client-name"
+          type="text"
+          placeholder="ชื่อเล่น / แอคเคาน์"
+          data-i18n="calc.info.client.placeholder"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Work Type -->
+  <div class="mb-6 pb-6 border-b border-line">
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.main.title">🎨 งานหลัก</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="calc-work-type" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.type">ประเภทงาน</label>
+        <select
+          id="calc-work-type"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        >
+          {workTypes.map((wt) => (
+            <option value={wt.id}>{wt.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div id="color-mode-field">
+        <span class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.color">รูปแบบสี</span>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="relative block">
+            <input type="radio" name="calc-color" value="bw" class="peer sr-only" />
+            <span class="block h-11 rounded-xl border border-line bg-white text-sm font-semibold text-muted text-center leading-[2.75rem] peer-checked:border-primary peer-checked:bg-secondary peer-checked:text-primary cursor-pointer transition-all" data-i18n="calc.main.color.bw">
+              B/W
+            </span>
+          </label>
+          <label class="relative block">
+            <input type="radio" name="calc-color" value="color" class="peer sr-only" checked />
+            <span class="block h-11 rounded-xl border border-line bg-white text-sm font-semibold text-muted text-center leading-[2.75rem] peer-checked:border-primary peer-checked:bg-secondary peer-checked:text-primary cursor-pointer transition-all" data-i18n="calc.main.color.full">
+              Full Color
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label for="calc-characters" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.chars">จำนวนตัวละคร</label>
+        <input
+          id="calc-characters"
+          type="number"
+          min="1"
+          max="6"
+          value="1"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        />
+      </div>
+
+      <div>
+        <label for="calc-complexity" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.main.complexity">ดีเทลตัวละคร</label>
+        <select
+          id="calc-complexity"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        >
+          {complexityOptions.map((opt) => (
+            <option value={opt.id} selected={opt.id === 'normal'}>
+              {opt.labelTh}{opt.surcharge > 0 ? ` (+${opt.surcharge})` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background & Usage -->
+  <div class="mb-6 pb-6 border-b border-line">
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.bg.title">🖼️ ฉากและสิทธิ์ใช้งาน</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="calc-background" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.bg.bg">ฉาก</label>
+        <select
+          id="calc-background"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        >
+          {backgroundOptions.filter(bg => bg.surcharge !== null).map((bg) => (
+            <option value={bg.id}>
+              {bg.labelTh}{bg.surcharge! > 0 ? ` (+${bg.surcharge})` : ''}
+            </option>
+          ))}
+        </select>
+        <p class="text-xs text-muted mt-1" data-i18n="calc.bg.bg.note">หมายเหตุ: ฉากละเอียดไม่รับในตอนนี้</p>
+      </div>
+
+      <div>
+        <label for="calc-rush" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.bg.rush">กำหนดส่ง</label>
+        <select
+          id="calc-rush"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        >
+          {rushOptions.filter(r => r.surcharge !== null).map((r) => (
+            <option value={r.id}>
+              {r.labelTh}{r.surcharge! > 0 ? ` (+${r.surcharge})` : ''}
+            </option>
+          ))}
+        </select>
+        <p class="text-xs text-muted mt-1" data-i18n="calc.bg.rush.note">24-48 ชม. ไม่รับงานเร่ง</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add-ons -->
+  <div class="mb-6 pb-6 border-b border-line">
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.addons.title">⚡ ตัวเลือกเสริม</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="space-y-3">
+        <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
+          <input type="checkbox" id="calc-commercial" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.commercial">เชิงพาณิชย์</span> <span class="text-muted">(×2)</span></span>
+        </label>
+
+        <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
+          <input type="checkbox" id="calc-live2d" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.live2d">แยกพาร์ต Live2D</span> <span class="text-muted">(+50%)</span></span>
+        </label>
+
+        <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors" id="adult-option-row">
+          <input type="checkbox" id="calc-adult" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.adult">เนื้อหาสำหรับผู้ใหญ่</span> <span class="text-muted">(+20%)</span></span>
+        </label>
+
+        <label class="hidden items-center gap-3 h-11 px-3 rounded-xl border border-amber-200 bg-amber-50 cursor-pointer" id="adult-confirm-row">
+          <input type="checkbox" id="calc-adult-confirm" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-amber-800" data-i18n="calc.addons.adult.confirm">ยืนยันว่าตัวละครทุกตัวเป็น 18+ และไม่ใช้ภาพลักษณ์เด็ก</span>
+        </label>
+      </div>
+
+      <div class="space-y-3" id="vtuber-options">
+        <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
+          <input type="checkbox" id="calc-rigging" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.rigging">Rigging</span> <span class="text-muted">(+฿3,000)</span></span>
+        </label>
+
+        <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
+          <input type="checkbox" id="calc-source-file" class="w-4.5 h-4.5 accent-primary" />
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.psd">ไฟล์ PSD</span> <span class="text-muted" data-i18n="calc.addons.psd.note">(Vtuber เท่านั้น +฿4,000)</span></span>
+        </label>
+
+        <div>
+          <label for="calc-extra-parts" class="block text-sm font-semibold text-ink mb-1.5"><span data-i18n="calc.addons.parts">ชิ้นส่วนเพิ่ม (ทรงผม/ชุด)</span> <span class="text-muted" data-i18n="calc.addons.parts.note">(+฿300/ชิ้น)</span></label>
+          <input
+            id="calc-extra-parts"
+            type="number"
+            min="0"
+            max="10"
+            value="0"
+            class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brief notes -->
+  <div class="mb-6">
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.brief.title">💬 บรีฟย่อ</h2>
+    <textarea
+      id="calc-notes"
+      rows="3"
+      placeholder="สรุปรายละเอียดท่าทาง เสื้อผ้า mood ฉาก และข้อห้ามของงาน"
+      data-i18n="calc.brief.placeholder"
+      class="w-full rounded-xl border border-line px-3 py-2.5 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition resize-y"
+    ></textarea>
+  </div>
+
+  <!-- Deposit -->
+  <div>
+    <h2 class="text-lg font-bold text-ink mb-4" data-i18n="calc.deposit.title">💰 มัดจำ</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div>
+        <label for="calc-deposit" class="block text-sm font-semibold text-ink mb-1.5" data-i18n="calc.deposit.amount">จำนวนมัดจำ (บาท)</label>
+        <input
+          id="calc-deposit"
+          type="number"
+          min="300"
+          step="100"
+          value="300"
+          class="w-full h-11 rounded-xl border border-line px-3 text-sm text-ink bg-white focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition"
+        />
+        <p class="text-xs text-muted mt-1" data-i18n="calc.deposit.note">ขั้นต่ำ 300 บาท</p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RATE, LIVE2D_RATE, COMMERCIAL_MULTIPLIER, SOURCE_FILE_PRICE, RIGGING_BASE_PRICE, EXTRA_PARTS_PRICE, MINIMUM_DEPOSIT } from '../data/pricing';
+---
+
+<BaseLayout
+  title="เรตราคา Commission"
+  description="ตารางราคา Commission ของ Gosofia — Head Shot, Half Body, Full Body, Chibi, Vtuber Model, Merch"
+>
+  <SiteHeader />
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-ink">💰 เรตราคา Commission</h1>
+      <p class="text-muted mt-2">ราคาเริ่มต้นตามประเภทงาน — ราคาจริงอาจปรับตามดีเทลและ scope จริง</p>
+    </div>
+
+    <!-- Work Types Table -->
+    <div class="rounded-2xl border border-line bg-white shadow-lg overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-secondary-light border-b border-line">
+              <th class="px-5 py-3 text-left font-bold text-primary">ประเภทงาน</th>
+              <th class="px-5 py-3 text-right font-bold text-primary">B/W</th>
+              <th class="px-5 py-3 text-right font-bold text-primary">Full Color</th>
+              <th class="px-5 py-3 text-right font-bold text-primary">ระยะเวลา (วัน)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            {workTypes.map((wt) => (
+              <tr class="hover:bg-surface transition-colors">
+                <td class="px-5 py-3">
+                  <div class="font-semibold text-ink">{wt.label}</div>
+                  <div class="text-xs text-muted">{wt.labelTh}</div>
+                </td>
+                <td class="px-5 py-3 text-right font-semibold text-ink">
+                  {wt.bw !== null ? `฿${wt.bw.toLocaleString()}` : '—'}
+                </td>
+                <td class="px-5 py-3 text-right font-semibold text-primary">
+                  ฿{wt.color.toLocaleString()}
+                </td>
+                <td class="px-5 py-3 text-right text-muted">
+                  {wt.estimatedDays[0]}–{wt.estimatedDays[1]}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add-ons Grid -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <!-- Complexity -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">🎯 ดีเทลตัวละคร</h3>
+        <ul class="space-y-2">
+          {complexityOptions.map((opt) => (
+            <li class="flex justify-between text-sm">
+              <span class="text-muted">{opt.labelTh}</span>
+              <span class="font-semibold text-ink">{opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Background -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">🖼️ ฉาก</h3>
+        <ul class="space-y-2">
+          {backgroundOptions.map((opt) => (
+            <li class="flex justify-between text-sm">
+              <span class="text-muted">{opt.labelTh}</span>
+              <span class="font-semibold text-ink">
+                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Rush -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">⚡ งานเร่ง</h3>
+        <ul class="space-y-2">
+          {rushOptions.map((opt) => (
+            <li class="flex justify-between text-sm">
+              <span class="text-muted">{opt.labelTh}</span>
+              <span class="font-semibold text-ink">
+                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Multipliers -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">📊 ตัวคูณ</h3>
+        <ul class="space-y-2">
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">เชิงพาณิชย์</span>
+            <span class="font-semibold text-ink">×{COMMERCIAL_MULTIPLIER}</span>
+          </li>
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">เนื้อหาผู้ใหญ่</span>
+            <span class="font-semibold text-ink">+{ADULT_RATE * 100}%</span>
+          </li>
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">แยกพาร์ต Live2D</span>
+            <span class="font-semibold text-ink">+{LIVE2D_RATE * 100}%</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Flat Add-ons -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">🔧 ตัวเลือกเสริม</h3>
+        <ul class="space-y-2">
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">ไฟล์ PSD (Vtuber)</span>
+            <span class="font-semibold text-ink">฿{SOURCE_FILE_PRICE.toLocaleString()}</span>
+          </li>
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">Rigging</span>
+            <span class="font-semibold text-ink">เริ่มที่ ฿{RIGGING_BASE_PRICE.toLocaleString()}</span>
+          </li>
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">ชิ้นส่วนเพิ่ม</span>
+            <span class="font-semibold text-ink">เริ่มที่ ฿{EXTRA_PARTS_PRICE.toLocaleString()}/ชิ้น</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Deposit -->
+      <div class="rounded-xl border border-line bg-white p-5">
+        <h3 class="text-base font-bold text-ink mb-3">💳 การชำระเงิน</h3>
+        <ul class="space-y-2">
+          <li class="flex justify-between text-sm">
+            <span class="text-muted">มัดจำขั้นต่ำ</span>
+            <span class="font-semibold text-ink">฿{MINIMUM_DEPOSIT.toLocaleString()}</span>
+          </li>
+          <li class="text-sm text-muted">ผ่อนได้สูงสุด 3 งวด</li>
+          <li class="text-sm text-muted">รับชำระผ่าน Stripe, Wise, Ko-fi</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center">
+      <a
+        href="/calculator/"
+        class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-colors shadow-lg shadow-primary/20"
+      >
+        🧮 ลองคำนวณราคาเลย
+      </a>
+    </div>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

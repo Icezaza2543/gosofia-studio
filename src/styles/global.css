@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* ─── Gosofia Studio Theme (Tailwind v4 CSS-based config) ─── */
+@theme {
+  /* Brand colors */
+  --color-primary: #640E00;
+  --color-primary-light: #8B1A0A;
+  --color-primary-dark: #4A0A00;
+  --color-secondary: #FFDED9;
+  --color-secondary-light: #FFF0ED;
+  --color-secondary-dark: #FFB8AE;
+
+  /* Surface & text */
+  --color-surface: #FFFAF9;
+  --color-surface-card: #FFFFFF;
+  --color-ink: #1A0F0D;
+  --color-muted: #6B5752;
+  --color-line: #F0D9D5;
+
+  /* Accent for interactions */
+  --color-accent: #C4392E;
+  --color-accent-soft: #FFF0ED;
+
+  /* Fonts — cute + readable */
+  --font-sans: 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+
+  /* Rounded corners — soft and friendly */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+}
+
+/* ─── Base styles ─── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+}
+
+/* ─── Utility classes ─── */
+@layer utilities {
+  /* Adult content blur */
+  .adult-blur {
+    filter: blur(12px);
+    transform: scale(1.05);
+    transition: filter 0.3s ease;
+  }
+
+  .adult-blur-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .adult-blur-overlay::after {
+    content: "18+";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(100, 14, 0, 0.45);
+    color: white;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: 0.05em;
+    z-index: 2;
+  }
+
+  /* Image protection: no-crop default */
+  .img-contain {
+    object-fit: contain;
+  }
+
+  .img-cover {
+    object-fit: cover;
+  }
+}

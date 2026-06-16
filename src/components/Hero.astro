@@ -1,0 +1,70 @@
+---
+import { artist } from '../data/artist';
+---
+
+<section class="relative overflow-hidden" id="hero">
+  <!-- Gradient background -->
+  <div class="absolute inset-0 bg-gradient-to-br from-secondary via-secondary-light to-surface"></div>
+  <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
+
+  <!-- Decorative circles -->
+  <div class="absolute top-10 right-10 w-64 h-64 rounded-full bg-primary/5 blur-3xl"></div>
+  <div class="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-secondary-dark/20 blur-2xl"></div>
+
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32">
+    <div class="max-w-2xl">
+      <!-- Status badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur border border-line text-sm font-semibold text-primary mb-6">
+        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+        Commission Open
+      </div>
+
+      <!-- Main heading -->
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary leading-tight mb-4">
+        <span data-i18n="hero.greeting">สวัสดี! เราชื่อ</span><br />
+        <span class="text-4xl sm:text-5xl lg:text-6xl">{artist.name}</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg" data-i18n="hero.bio">
+        {artist.bio}
+      </p>
+
+      <!-- Specialties -->
+      <div class="flex flex-wrap gap-2 mb-8">
+        {artist.specialties.map((tag) => (
+          <span class="px-3 py-1 rounded-full bg-white/60 border border-line text-sm font-semibold text-primary/80">
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      <!-- CTA buttons -->
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/portfolio/"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-light transition-colors shadow-lg shadow-primary/20"
+          id="cta-portfolio"
+        >
+          <span data-i18n="hero.cta.portfolio">ดูผลงาน</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </a>
+        <a
+          href="/calculator/"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-primary font-bold text-base border-2 border-primary/20 hover:border-primary/40 hover:bg-secondary-light transition-colors"
+          id="cta-calculator"
+          data-i18n="hero.cta.calculator"
+        >
+          คำนวณราคา
+        </a>
+        <a
+          href="/contact/"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/60 text-muted font-bold text-base border border-line hover:text-primary hover:bg-white transition-colors"
+          id="cta-contact"
+          data-i18n="hero.cta.contact"
+        >
+          ติดต่อ
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

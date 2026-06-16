@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Hero from '../components/Hero.astro';
+import PortfolioGrid from '../components/PortfolioGrid.astro';
+import AgeGateModal from '../components/AgeGateModal.astro';
+import { artist } from '../data/artist';
+---
+
+<BaseLayout
+  title="Gosofia Artwork"
+  description={`${artist.name} — ${artist.bioShort} รับ Commission วาด Character Art, Vtuber Model, Merch Illustration`}
+>
+  <SiteHeader />
+
+  <main>
+    <Hero />
+
+    <!-- Featured SFW Portfolio -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <h2 class="text-3xl font-extrabold text-ink mb-2" data-i18n="home.featured">✨ ผลงานตัวอย่าง</h2>
+          <p class="text-muted" data-i18n="home.featured.sub">ตัวอย่างผลงานล่าสุดของ {artist.name}</p>
+        </div>
+        <a href="/portfolio/" class="hidden sm:inline-flex text-primary font-bold hover:underline" data-i18n="home.featured.viewAll">ดูทั้งหมด</a>
+      </div>
+
+      <PortfolioGrid sfwOnly={true} limit={4} />
+
+      <div class="mt-8 text-center sm:hidden">
+        <a href="/portfolio/" class="inline-flex px-6 py-3 bg-secondary-light text-primary font-bold rounded-xl" data-i18n="home.featured.viewAllMobile">
+          ดูผลงานทั้งหมด &rarr;
+        </a>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="py-20 bg-surface border-y border-line">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl font-extrabold text-ink text-center mb-12" data-i18n="home.actions.title">🎯 สิ่งที่คุณทำได้</h2>
+        
+        <div class="grid sm:grid-cols-3 gap-6">
+          <!-- Action 1 -->
+          <a href="/calculator/" class="group block p-6 bg-white rounded-2xl border border-line hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div class="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🧮</div>
+            <h3 class="text-lg font-bold text-ink mb-2" data-i18n="home.actions.calc.title">คำนวณราคา</h3>
+            <p class="text-sm text-muted" data-i18n="home.actions.calc.desc">ประเมินราคา Commission เบื้องต้น พร้อมสร้างบรีฟอัตโนมัติ</p>
+          </a>
+
+          <!-- Action 2 -->
+          <a href="/pricing/" class="group block p-6 bg-white rounded-2xl border border-line hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div class="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">💰</div>
+            <h3 class="text-lg font-bold text-ink mb-2" data-i18n="home.actions.pricing.title">ดูเรตราคา</h3>
+            <p class="text-sm text-muted" data-i18n="home.actions.pricing.desc">ตารางราคาตามประเภทงาน สี สเกล และตัวเลือกเสริมต่าง ๆ</p>
+          </a>
+
+          <!-- Action 3 -->
+          <a href="/contact/" class="group block p-6 bg-white rounded-2xl border border-line hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div class="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">💬</div>
+            <h3 class="text-lg font-bold text-ink mb-2" data-i18n="home.actions.contact.title">ติดต่อ</h3>
+            <p class="text-sm text-muted" data-i18n="home.actions.contact.desc">ส่งบรีฟมาคุยรายละเอียดงานกันได้เลย</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <AgeGateModal />
+  <SiteFooter />
+</BaseLayout>
