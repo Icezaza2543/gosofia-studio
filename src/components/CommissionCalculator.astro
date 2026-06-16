@@ -5,8 +5,11 @@ import {
   backgroundOptions,
   rushOptions,
   EXTRA_PARTS_PRICE,
+  EXTRA_PARTS_PRICE_USD,
   RIGGING_BASE_PRICE,
+  RIGGING_BASE_PRICE_USD,
   SOURCE_FILE_PRICE,
+  SOURCE_FILE_PRICE_USD,
 } from '../data/pricing';
 ---
 
@@ -130,6 +133,7 @@ import {
               data-label-th={opt.labelTh}
               data-label-en={opt.label}
               data-surcharge={opt.surcharge}
+              data-surcharge-usd={opt.surchargeUsd}
             >
               {opt.labelTh}{opt.surcharge > 0 ? ` (+${opt.surcharge})` : ''}
             </option>
@@ -155,6 +159,7 @@ import {
               data-label-th={bg.labelTh}
               data-label-en={bg.label}
               data-surcharge={bg.surcharge}
+              data-surcharge-usd={bg.surchargeUsd}
             >
               {bg.labelTh}{bg.surcharge! > 0 ? ` (+${bg.surcharge})` : ''}
             </option>
@@ -175,6 +180,7 @@ import {
               data-label-th={r.labelTh}
               data-label-en={r.label}
               data-surcharge={r.surcharge}
+              data-surcharge-usd={r.surchargeUsd}
             >
               {r.labelTh}{r.surcharge! > 0 ? ` (+${r.surcharge})` : ''}
             </option>
@@ -214,16 +220,16 @@ import {
       <div class="space-y-3" id="vtuber-options">
         <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
           <input type="checkbox" id="calc-rigging" class="w-4.5 h-4.5 accent-primary" />
-          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.rigging">Rigging</span> <span id="calc-rigging-note" class="text-muted" data-amount={RIGGING_BASE_PRICE}>(+฿3,000)</span></span>
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.rigging">Rigging</span> <span id="calc-rigging-note" class="text-muted" data-amount={RIGGING_BASE_PRICE} data-amount-usd={RIGGING_BASE_PRICE_USD}>(+฿3,000)</span></span>
         </label>
 
         <label class="flex items-center gap-3 h-11 px-3 rounded-xl border border-line bg-white cursor-pointer hover:border-primary/20 transition-colors">
           <input type="checkbox" id="calc-source-file" class="w-4.5 h-4.5 accent-primary" />
-          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.psd">ไฟล์ PSD</span> <span id="calc-source-file-note" class="text-muted" data-i18n="calc.addons.psd.note" data-amount={SOURCE_FILE_PRICE}>(Vtuber เท่านั้น +฿4,000)</span></span>
+          <span class="text-sm font-semibold text-ink"><span data-i18n="calc.addons.psd">ไฟล์ PSD</span> <span id="calc-source-file-note" class="text-muted" data-i18n="calc.addons.psd.note" data-amount={SOURCE_FILE_PRICE} data-amount-usd={SOURCE_FILE_PRICE_USD}>(Vtuber เท่านั้น +฿4,000)</span></span>
         </label>
 
         <div>
-          <label for="calc-extra-parts" class="block text-sm font-semibold text-ink mb-1.5"><span data-i18n="calc.addons.parts">ชิ้นส่วนเพิ่ม (ทรงผม/ชุด)</span> <span id="calc-extra-parts-note" class="text-muted" data-i18n="calc.addons.parts.note" data-amount={EXTRA_PARTS_PRICE}>(+฿300/ชิ้น)</span></label>
+          <label for="calc-extra-parts" class="block text-sm font-semibold text-ink mb-1.5"><span data-i18n="calc.addons.parts">ชิ้นส่วนเพิ่ม (ทรงผม/ชุด)</span> <span id="calc-extra-parts-note" class="text-muted" data-i18n="calc.addons.parts.note" data-amount={EXTRA_PARTS_PRICE} data-amount-usd={EXTRA_PARTS_PRICE_USD}>(+฿300/ชิ้น)</span></label>
           <input
             id="calc-extra-parts"
             type="number"

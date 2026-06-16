@@ -116,14 +116,14 @@ export function calculateIllustrationPrice(
   const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
 
   // ─── Step 1: Art subtotal ───
-  const base = (input.colorMode === 'bw' && workType.bw !== null)
-    ? workType.bw
-    : workType.color;
+  const base = lang === 'en'
+    ? (input.colorMode === 'bw' && workType.bwUsd !== null ? workType.bwUsd : workType.colorUsd)
+    : (input.colorMode === 'bw' && workType.bw !== null ? workType.bw : workType.color);
 
   const characterCount = Math.max(1, Math.min(6, input.characterCount));
   const characterFee = (characterCount - 1) * base;
-  const complexityFee = complexity.surcharge;
-  const backgroundFee = background.surcharge ?? 0;
+  const complexityFee = lang === 'en' ? complexity.surchargeUsd : complexity.surcharge;
+  const backgroundFee = lang === 'en' ? (background.surchargeUsd ?? 0) : (background.surcharge ?? 0);
   const artSubtotal = base + characterFee + complexityFee + backgroundFee;
 
   let adultFee = 0;
@@ -140,19 +140,20 @@ export function calculateIllustrationPrice(
     const adjustedArt = artSubtotal + adultFee + live2dFee;
     commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
     
-    rushFee = rush.surcharge ?? 0;
-    sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber') ? SOURCE_FILE_PRICE : 0;
-    riggingFee = input.wantRigging ? RIGGING_BASE_PRICE : 0;
-    extraPartsFee = Math.max(0, input.extraPartsCount) * EXTRA_PARTS_PRICE;
+    rushFee = lang === 'en' ? (rush.surchargeUsd ?? 0) : (rush.surcharge ?? 0);
+    sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber') ? (lang === 'en' ? SOURCE_FILE_PRICE_USD : SOURCE_FILE_PRICE) : 0;
+    riggingFee = input.wantRigging ? (lang === 'en' ? RIGGING_BASE_PRICE_USD : RIGGING_BASE_PRICE) : 0;
+    extraPartsFee = Math.max(0, input.extraPartsCount) * (lang === 'en' ? EXTRA_PARTS_PRICE_USD : EXTRA_PARTS_PRICE);
   }
 
   const adjustedArt = artSubtotal + adultFee + live2dFee;
   const flatFees = rushFee + sourceFileFee + riggingFee + extraPartsFee;
   const total = adjustedArt + commercialFee + flatFees;
 
-  const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR)) / 10) * 10);
-  const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)) / 10) * 10;
-  const deposit = Math.min(total, Math.max(MINIMUM_DEPOSIT, input.depositAmount));
+  const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR))));
+  const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)));
+  const minDeposit = lang === 'en' ? MINIMUM_DEPOSIT_USD : MINIMUM_DEPOSIT;
+  const deposit = Math.min(total, Math.max(minDeposit, input.depositAmount));
   const balance = Math.max(0, total - deposit);
 
   const breakdown: BreakdownItem[] = [];
@@ -198,7 +199,8 @@ export function calculateIllustrationPrice(
 
 export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage): PriceResult {
   const doujinPages = Math.max(1, input.doujinPages);
-  const innerSubtotal = doujinPages * DOUJIN_PAGE_PRICE_THB;
+  const pagePrice = lang === 'en' ? DOUJIN_PAGE_PRICE_USD : DOUJIN_PAGE_PRICE_THB;
+  const innerSubtotal = doujinPages * pagePrice;
   
   const doujinWorkType = workTypes.find(w => w.id === 'doujin')!;
   
@@ -235,7 +237,7 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
   const commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
   
   const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
-  const rushFee = rush.surcharge ?? 0;
+  const rushFee = lang === 'en' ? (rush.surchargeUsd ?? 0) : (rush.surcharge ?? 0);
   const flatFees = rushFee;
   
   const total = adjustedArt + commercialFee + flatFees;
@@ -245,9 +247,10 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
   if (commercialFee > 0) breakdown.push({ label: lang === 'en' ? 'Commercial use (x2)' : 'สิทธิ์เชิงพาณิชย์ (×2)', amount: commercialFee });
   if (rushFee > 0) breakdown.push({ label: labelFor(rush, lang), amount: rushFee });
 
-  const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR)) / 10) * 10);
-  const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)) / 10) * 10;
-  const deposit = Math.min(total, Math.max(MINIMUM_DEPOSIT, input.depositAmount));
+  const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR))));
+  const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)));
+  const minDeposit = lang === 'en' ? MINIMUM_DEPOSIT_USD : MINIMUM_DEPOSIT;
+  const deposit = Math.min(total, Math.max(minDeposit, input.depositAmount));
   const balance = Math.max(0, total - deposit);
 
   return {

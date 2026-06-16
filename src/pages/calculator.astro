@@ -33,7 +33,7 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
 
   import { calculatePrice, type CalculatorInput, type PriceLanguage } from '../lib/calculatePrice';
   import { buildBrief } from '../lib/buildBrief';
-  import { formatMoney, thbToUsd, usdToThb } from '../lib/formatMoney';
+  import { formatMoney } from '../lib/formatMoney';
   import { i18n, type Language } from '../data/i18n';
   import { workTypes } from '../data/pricing';
 
@@ -96,16 +96,16 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     [els.complexity, els.background, els.rush].forEach((select) => {
       select.querySelectorAll<HTMLOptionElement>('option').forEach((option) => {
         const label = option.dataset[lang === 'en' ? 'labelEn' : 'labelTh'] || option.textContent || '';
-        const surcharge = Number(option.dataset.surcharge) || 0;
+        const surcharge = Number(option.dataset[lang === 'en' ? 'surchargeUsd' : 'surcharge']) || 0;
         option.textContent = surcharge > 0 ? `${label} (+${formatMoney(surcharge, lang)})` : label;
       });
     });
   }
 
   function updateLocalizedPriceHints(lang: PriceLanguage) {
-    const riggingAmount = Number(els.riggingNote.dataset.amount) || 0;
-    const sourceFileAmount = Number(els.sourceFileNote.dataset.amount) || 0;
-    const extraPartsAmount = Number(els.extraPartsNote.dataset.amount) || 0;
+    const riggingAmount = Number(els.riggingNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
+    const sourceFileAmount = Number(els.sourceFileNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
+    const extraPartsAmount = Number(els.extraPartsNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
 
     els.riggingNote.textContent = `(+${formatMoney(riggingAmount, lang)})`;
     els.sourceFileNote.textContent = lang === 'en'
@@ -115,27 +115,36 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       ? `(+${formatMoney(extraPartsAmount, lang)}/part)`
       : `(+${formatMoney(extraPartsAmount, lang)}/ชิ้น)`;
     els.depositNote.textContent = lang === 'en'
-      ? `Minimum ${formatMoney(300, lang)}`
-      : 'ขั้นต่ำ 300 บาท';
+      ? `Minimum ${formatMoney(10, lang)}`
+      : `ขั้นต่ำ ${formatMoney(300, lang)}`;
   }
 
   function syncDepositInputCurrency(lang: PriceLanguage) {
     const currentCurrency = (els.deposit.dataset.currency as PriceLanguage | undefined) || 'th';
-    els.deposit.min = lang === 'en' ? String(Math.max(1, Math.round(thbToUsd(300)))) : '300';
+    els.deposit.min = lang === 'en' ? '10' : '300';
     els.deposit.step = lang === 'en' ? '1' : '100';
 
     if (currentCurrency === lang) return;
 
+    // Use a fixed rough conversion just for UI convenience when toggling language
+    const UI_CONVERSION_RATE = 32.5;
     const currentValue = Number(els.deposit.value) || 0;
-    const currentThbValue = currentCurrency === 'en' ? usdToThb(currentValue) : currentValue;
-    els.deposit.value = lang === 'en'
-      ? String(Math.max(1, Math.round(thbToUsd(currentThbValue))))
-      : String(Math.round(currentThbValue));
+    const currentThbValue = currentCurrency === 'en' ? currentValue * UI_CONVERSION_RATE : currentValue;
+    
+    let newValue;
+    if (lang === 'en') {
+      newValue = Math.max(10, Math.round(currentThbValue / UI_CONVERSION_RATE));
+    } else {
+      newValue = Math.max(300, Math.round(currentThbValue));
+    }
+    
+    els.deposit.value = String(newValue);
     els.deposit.dataset.currency = lang;
   }
 
   function getInput(lang: PriceLanguage): CalculatorInput {
-    const depositAmount = Number(els.deposit.value) || (lang === 'en' ? thbToUsd(300) : 300);
+    const minD = lang === 'en' ? 10 : 300;
+    const depositAmount = Number(els.deposit.value) || minD;
 
     return {
       workTypeId: els.workType.value,

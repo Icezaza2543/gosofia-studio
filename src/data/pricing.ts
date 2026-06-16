@@ -10,8 +10,10 @@ export interface WorkTypeConfig {
   labelTh: string;
   /** Base price for B/W, null if not available */
   bw: number | null;
+  bwUsd: number | null;
   /** Base price for Full Color */
   color: number;
+  colorUsd: number;
   /** Whether color mode is selectable (false = full color only) */
   hasColorChoice: boolean;
   /** Whether adult-category option is available for this type */
@@ -26,7 +28,9 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Head Shot / Bust Up',
     labelTh: 'เฮดช็อต / ครึ่งตัวบน',
     bw: 400,
+    bwUsd: 20,
     color: 450,
+    colorUsd: 25,
     hasColorChoice: true,
     adultAvailable: true,
     estimatedDays: [5, 7],
@@ -36,7 +40,9 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Half Body / Thigh Up',
     labelTh: 'ครึ่งตัว / เหนือเข่า',
     bw: 700,
+    bwUsd: 40,
     color: 900,
+    colorUsd: 50,
     hasColorChoice: true,
     adultAvailable: true,
     estimatedDays: [10, 15],
@@ -46,7 +52,9 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Full Body',
     labelTh: 'เต็มตัว',
     bw: 1000,
+    bwUsd: 50,
     color: 1200,
+    colorUsd: 80,
     hasColorChoice: true,
     adultAvailable: true,
     estimatedDays: [15, 20],
@@ -56,9 +64,10 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Chibi',
     labelTh: 'ชิบิ',
     bw: null,
+    bwUsd: null,
     color: 800,
+    colorUsd: 45,
     hasColorChoice: false,
-    // Configurable: set to false to disable adult option for Chibi
     adultAvailable: true,
     estimatedDays: [5, 10],
   },
@@ -67,7 +76,9 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Vtuber Model',
     labelTh: 'โมเดลวีทูเบอร์',
     bw: null,
+    bwUsd: null,
     color: 4000,
+    colorUsd: 150,
     hasColorChoice: false,
     adultAvailable: true,
     estimatedDays: [30, 60],
@@ -77,7 +88,9 @@ export const workTypes: WorkTypeConfig[] = [
     label: 'Merch / Pillowcase / Dakimakura',
     labelTh: 'สินค้า / ปลอกหมอน / ดากิมากุระ',
     bw: null,
+    bwUsd: null,
     color: 2000,
+    colorUsd: 90,
     hasColorChoice: false,
     adultAvailable: true,
     estimatedDays: [15, 20],
@@ -86,9 +99,11 @@ export const workTypes: WorkTypeConfig[] = [
     id: 'doujin',
     label: 'Doujin Commission',
     labelTh: 'รับวาดโดจิน',
-    bw: null, // Doujin inner pages are dynamically calculated based on pages
-    color: null as any, // Not applicable, color/bw is determined by cover
-    hasColorChoice: false, // Color choice is tied to the cover, not the base Doujin type
+    bw: null,
+    bwUsd: null,
+    color: null as any,
+    colorUsd: null as any,
+    hasColorChoice: false,
     adultAvailable: true,
     estimatedDays: [15, 45],
   },
@@ -100,13 +115,14 @@ export interface ComplexityOption {
   labelTh: string;
   /** Flat surcharge amount in THB */
   surcharge: number;
+  surchargeUsd: number;
 }
 
 export const complexityOptions: ComplexityOption[] = [
-  { id: 'simple', label: 'Simple', labelTh: 'เรียบง่าย', surcharge: 0 },
-  { id: 'normal', label: 'Normal', labelTh: 'ปกติ', surcharge: 0 },
-  { id: 'detailed', label: 'Detailed', labelTh: 'ละเอียด', surcharge: 200 },
-  { id: 'extra', label: 'Extra Detailed', labelTh: 'ละเอียดมาก', surcharge: 500 },
+  { id: 'simple', label: 'Simple', labelTh: 'เรียบง่าย', surcharge: 0, surchargeUsd: 0 },
+  { id: 'normal', label: 'Normal', labelTh: 'ปกติ', surcharge: 0, surchargeUsd: 0 },
+  { id: 'detailed', label: 'Detailed', labelTh: 'ละเอียด', surcharge: 200, surchargeUsd: 7 },
+  { id: 'extra', label: 'Extra Detailed', labelTh: 'ละเอียดมาก', surcharge: 500, surchargeUsd: 15 },
 ];
 
 export interface BackgroundOption {
@@ -115,13 +131,14 @@ export interface BackgroundOption {
   labelTh: string;
   /** Flat surcharge amount in THB, null if unavailable */
   surcharge: number | null;
+  surchargeUsd: number | null;
 }
 
 export const backgroundOptions: BackgroundOption[] = [
-  { id: 'none', label: 'None / Flat Color', labelTh: 'ไม่มี / สีพื้น', surcharge: 0 },
-  { id: 'simple', label: 'Simple', labelTh: 'ฉากง่าย', surcharge: 500 },
-  { id: 'medium', label: 'Medium', labelTh: 'ฉากปานกลาง', surcharge: 1000 },
-  { id: 'detailed', label: 'Detailed', labelTh: 'ฉากละเอียด (ไม่รับ)', surcharge: null },
+  { id: 'none', label: 'None / Flat Color', labelTh: 'ไม่มี / สีพื้น', surcharge: 0, surchargeUsd: 0 },
+  { id: 'simple', label: 'Simple', labelTh: 'ฉากง่าย', surcharge: 500, surchargeUsd: 15 },
+  { id: 'medium', label: 'Medium', labelTh: 'ฉากปานกลาง', surcharge: 1000, surchargeUsd: 30 },
+  { id: 'detailed', label: 'Detailed', labelTh: 'ฉากละเอียด (ไม่รับ)', surcharge: null, surchargeUsd: null },
 ];
 
 export interface RushOption {
@@ -130,13 +147,14 @@ export interface RushOption {
   labelTh: string;
   /** Flat surcharge in THB, null if unavailable */
   surcharge: number | null;
+  surchargeUsd: number | null;
 }
 
 export const rushOptions: RushOption[] = [
-  { id: 'normal', label: 'Normal Queue', labelTh: 'คิวปกติ', surcharge: 0 },
-  { id: 'rush7', label: '7 Days Rush', labelTh: 'เร่ง 7 วัน', surcharge: 500 },
-  { id: 'rush3', label: '3 Days Rush', labelTh: 'เร่ง 3 วัน', surcharge: 1000 },
-  { id: 'rush24', label: '24-48 Hours', labelTh: '24-48 ชม. (ไม่รับ)', surcharge: null },
+  { id: 'normal', label: 'Normal Queue', labelTh: 'คิวปกติ', surcharge: 0, surchargeUsd: 0 },
+  { id: 'rush7', label: '7 Days Rush', labelTh: 'เร่ง 7 วัน', surcharge: 500, surchargeUsd: 15 },
+  { id: 'rush3', label: '3 Days Rush', labelTh: 'เร่ง 3 วัน', surcharge: 1000, surchargeUsd: 30 },
+  { id: 'rush24', label: '24-48 Hours', labelTh: '24-48 ชม. (ไม่รับ)', surcharge: null, surchargeUsd: null },
 ];
 
 // ─── Multiplier rates ───
@@ -155,18 +173,23 @@ export const COMMERCIAL_MULTIPLIER = 2;
 
 /** Doujin page price */
 export const DOUJIN_PAGE_PRICE_THB = 450;
+export const DOUJIN_PAGE_PRICE_USD = 15;
 
 /** Source file / PSD — only available for Vtuber model */
 export const SOURCE_FILE_PRICE = 4000;
+export const SOURCE_FILE_PRICE_USD = 125;
 
 /** Rigging add-on base price */
 export const RIGGING_BASE_PRICE = 3000;
+export const RIGGING_BASE_PRICE_USD = 93;
 
 /** Extra model parts / hair / outfit starting price */
 export const EXTRA_PARTS_PRICE = 300;
+export const EXTRA_PARTS_PRICE_USD = 10;
 
-/** Minimum deposit in THB */
+/** Minimum deposit */
 export const MINIMUM_DEPOSIT = 300;
+export const MINIMUM_DEPOSIT_USD = 10;
 
 // ─── Payment methods ───
 export const paymentMethods = [
