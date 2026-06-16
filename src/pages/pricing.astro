@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RATE, LIVE2D_RATE, COMMERCIAL_MULTIPLIER, SOURCE_FILE_PRICE, RIGGING_BASE_PRICE, EXTRA_PARTS_PRICE, MINIMUM_DEPOSIT } from '../data/pricing';
+import { formatMoney } from '../lib/formatMoney';
 ---
 
 <BaseLayout
@@ -37,10 +38,10 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
                   <div class="text-xs text-muted">{wt.labelTh}</div>
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-ink">
-                  {wt.bw !== null ? `฿${wt.bw.toLocaleString()}` : '—'}
+                  {wt.bw !== null ? <span data-money-thb={wt.bw}>{formatMoney(wt.bw)}</span> : '—'}
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-primary">
-                  ฿{wt.color.toLocaleString()}
+                  <span data-money-thb={wt.color}>{formatMoney(wt.color)}</span>
                 </td>
                 <td class="px-5 py-3 text-right text-muted">
                   {wt.estimatedDays[0]}–{wt.estimatedDays[1]}
@@ -61,7 +62,7 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
           {complexityOptions.map((opt) => (
             <li class="flex justify-between text-sm">
               <span class="text-muted">{opt.labelTh}</span>
-              <span class="font-semibold text-ink">{opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}</span>
+              <span class="font-semibold text-ink">{opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}</span>
             </li>
           ))}
         </ul>
@@ -75,7 +76,7 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
             <li class="flex justify-between text-sm">
               <span class="text-muted">{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}
+                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}
               </span>
             </li>
           ))}
@@ -90,7 +91,7 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
             <li class="flex justify-between text-sm">
               <span class="text-muted">{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? `+฿${opt.surcharge}` : 'ไม่คิดเพิ่ม'}
+                {opt.surcharge === null ? 'ไม่รับ' : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : 'ไม่คิดเพิ่ม'}
               </span>
             </li>
           ))}
@@ -122,15 +123,15 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
             <span class="text-muted">ไฟล์ PSD (Vtuber)</span>
-            <span class="font-semibold text-ink">฿{SOURCE_FILE_PRICE.toLocaleString()}</span>
+            <span class="font-semibold text-ink" data-money-thb={SOURCE_FILE_PRICE}>{formatMoney(SOURCE_FILE_PRICE)}</span>
           </li>
           <li class="flex justify-between text-sm">
             <span class="text-muted">Rigging</span>
-            <span class="font-semibold text-ink">เริ่มที่ ฿{RIGGING_BASE_PRICE.toLocaleString()}</span>
+            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={RIGGING_BASE_PRICE}>{formatMoney(RIGGING_BASE_PRICE)}</span></span>
           </li>
           <li class="flex justify-between text-sm">
             <span class="text-muted">ชิ้นส่วนเพิ่ม</span>
-            <span class="font-semibold text-ink">เริ่มที่ ฿{EXTRA_PARTS_PRICE.toLocaleString()}/ชิ้น</span>
+            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={EXTRA_PARTS_PRICE} data-money-suffix-th="/ชิ้น" data-money-suffix-en="/part">{formatMoney(EXTRA_PARTS_PRICE)}/ชิ้น</span></span>
           </li>
         </ul>
       </div>
@@ -141,7 +142,7 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
             <span class="text-muted">มัดจำขั้นต่ำ</span>
-            <span class="font-semibold text-ink">฿{MINIMUM_DEPOSIT.toLocaleString()}</span>
+            <span class="font-semibold text-ink" data-money-thb={MINIMUM_DEPOSIT}>{formatMoney(MINIMUM_DEPOSIT)}</span>
           </li>
           <li class="text-sm text-muted">ผ่อนได้สูงสุด 3 งวด</li>
           <li class="text-sm text-muted">รับชำระผ่าน Stripe, Wise, Ko-fi</li>
@@ -162,3 +163,28 @@ import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RAT
 
   <SiteFooter />
 </BaseLayout>
+
+<script>
+  import { formatMoney, type MoneyLanguage } from '../lib/formatMoney';
+
+  function getMoneyLanguage(): MoneyLanguage {
+    return localStorage.getItem('gosofia-lang') === 'en' || document.documentElement.lang === 'en'
+      ? 'en'
+      : 'th';
+  }
+
+  function renderPricingMoney() {
+    const lang = getMoneyLanguage();
+    document.querySelectorAll<HTMLElement>('[data-money-thb]').forEach((el) => {
+      const amount = Number(el.dataset.moneyThb) || 0;
+      const prefix = el.dataset.moneyPrefix || '';
+      const suffix = lang === 'en'
+        ? (el.dataset.moneySuffixEn || '')
+        : (el.dataset.moneySuffixTh || '');
+      el.textContent = `${prefix}${formatMoney(amount, lang)}${suffix}`;
+    });
+  }
+
+  window.addEventListener('languageChanged', renderPricingMoney);
+  renderPricingMoney();
+</script>

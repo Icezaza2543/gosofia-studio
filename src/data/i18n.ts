@@ -91,10 +91,15 @@ export const i18n = {
     // Price Breakdown
     'price.total.label': 'ราคารวมโดยประมาณ',
     'price.range.default': 'เลือกตัวเลือกเพื่อเริ่มประเมินราคา',
+    'price.range.afterBrief': 'หลังดูบรีฟจริง',
     'price.btn.copy': 'คัดลอกบรีฟ',
+    'price.btn.copied': '✓ คัดลอกแล้ว!',
+    'price.btn.reset': 'รีเซ็ต',
     'price.policy.adult': 'งานสำหรับผู้ใหญ่ต้องยืนยันว่าตัวละครทุกตัวเป็น 18+ ก่อนคัดลอกบรีฟ',
+    'price.policy.adultBrief': 'ยืนยันนโยบายผู้ใหญ่เพื่อดูบรีฟ',
     'price.policy.normal': 'ระบบนี้ใช้ประเมินราคาเบื้องต้น ราคาอาจปรับเปลี่ยนได้หลังดูบรีฟจริง',
     'price.note': 'ราคานี้เป็นราคาเริ่มต้นสำหรับคัดกรอง requirement ก่อนคุยรายละเอียดจริง',
+    'price.panel.aria': 'ราคารวม',
 
     // Pricing Page
     'pricing.page.title': '💰 เรตราคา Commission',
@@ -222,22 +227,27 @@ export const i18n = {
     'calc.addons.adult.confirm': 'I confirm all characters are 18+ and have no child-like appearance.',
     'calc.addons.rigging': 'Rigging',
     'calc.addons.psd': 'PSD Source File',
-    'calc.addons.psd.note': '(Vtuber only +฿4,000)',
+    'calc.addons.psd.note': '(Vtuber only +$123)',
     'calc.addons.parts': 'Extra Parts (Hair/Outfit)',
-    'calc.addons.parts.note': '(+฿300/part)',
+    'calc.addons.parts.note': '(+$9/part)',
     'calc.brief.title': '💬 Brief Notes',
     'calc.brief.placeholder': 'Summarize poses, outfits, mood, background, and any restrictions.',
     'calc.deposit.title': '💰 Deposit',
-    'calc.deposit.amount': 'Deposit Amount (THB)',
-    'calc.deposit.note': 'Minimum 300 THB',
+    'calc.deposit.amount': 'Deposit Amount (USD)',
+    'calc.deposit.note': 'Minimum $9',
 
     // Price Breakdown
     'price.total.label': 'Estimated Total',
     'price.range.default': 'Select options to start estimating',
+    'price.range.afterBrief': 'after brief review',
     'price.btn.copy': 'Copy Brief',
+    'price.btn.copied': '✓ Copied!',
+    'price.btn.reset': 'Reset',
     'price.policy.adult': 'For adult content, you must confirm all characters are 18+ before copying the brief.',
+    'price.policy.adultBrief': 'Confirm the adult-content policy to preview the brief.',
     'price.policy.normal': 'This system provides a preliminary estimate. The final price may adjust after reviewing the brief.',
     'price.note': 'This is a starting price to screen requirements before detailed discussion.',
+    'price.panel.aria': 'Estimated total',
 
     // Pricing Page
     'pricing.page.title': '💰 Commission Rates',

@@ -31,9 +31,10 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
   // ─── Calculator Client-Side Logic ───
   // Imports the pure calculation function and wires it to the UI
 
-  import { calculatePrice, type CalculatorInput } from '../lib/calculatePrice';
+  import { calculatePrice, type CalculatorInput, type PriceLanguage } from '../lib/calculatePrice';
   import { buildBrief } from '../lib/buildBrief';
-  import { formatMoney } from '../lib/formatMoney';
+  import { formatMoney, thbToUsd, usdToThb } from '../lib/formatMoney';
+  import { i18n, type Language } from '../data/i18n';
   import { workTypes } from '../data/pricing';
 
   // ─── DOM references ───
@@ -56,6 +57,10 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     notes: document.getElementById('calc-notes') as HTMLTextAreaElement,
     projectTitle: document.getElementById('calc-project-title') as HTMLInputElement,
     clientName: document.getElementById('calc-client-name') as HTMLInputElement,
+    riggingNote: document.getElementById('calc-rigging-note') as HTMLElement,
+    sourceFileNote: document.getElementById('calc-source-file-note') as HTMLElement,
+    extraPartsNote: document.getElementById('calc-extra-parts-note') as HTMLElement,
+    depositNote: document.getElementById('calc-deposit-note') as HTMLElement,
     // Output
     total: document.getElementById('calc-total') as HTMLElement,
     range: document.getElementById('calc-range') as HTMLElement,
@@ -72,7 +77,61 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     return (checked?.value === 'bw') ? 'bw' : 'color';
   }
 
-  function getInput(): CalculatorInput {
+  function getLanguage(): PriceLanguage {
+    const savedLang = localStorage.getItem('gosofia-lang') as Language | null;
+    const docLang = document.documentElement.lang as Language;
+    return savedLang === 'en' || docLang === 'en' ? 'en' : 'th';
+  }
+
+  function getText(lang: PriceLanguage, key: keyof typeof i18n.th): string {
+    return i18n[lang][key] ?? i18n.th[key];
+  }
+
+  function updateLocalizedOptions(lang: PriceLanguage) {
+    [els.complexity, els.background, els.rush].forEach((select) => {
+      select.querySelectorAll<HTMLOptionElement>('option').forEach((option) => {
+        const label = option.dataset[lang === 'en' ? 'labelEn' : 'labelTh'] || option.textContent || '';
+        const surcharge = Number(option.dataset.surcharge) || 0;
+        option.textContent = surcharge > 0 ? `${label} (+${formatMoney(surcharge, lang)})` : label;
+      });
+    });
+  }
+
+  function updateLocalizedPriceHints(lang: PriceLanguage) {
+    const riggingAmount = Number(els.riggingNote.dataset.amount) || 0;
+    const sourceFileAmount = Number(els.sourceFileNote.dataset.amount) || 0;
+    const extraPartsAmount = Number(els.extraPartsNote.dataset.amount) || 0;
+
+    els.riggingNote.textContent = `(+${formatMoney(riggingAmount, lang)})`;
+    els.sourceFileNote.textContent = lang === 'en'
+      ? `(Vtuber only +${formatMoney(sourceFileAmount, lang)})`
+      : `(Vtuber เท่านั้น +${formatMoney(sourceFileAmount, lang)})`;
+    els.extraPartsNote.textContent = lang === 'en'
+      ? `(+${formatMoney(extraPartsAmount, lang)}/part)`
+      : `(+${formatMoney(extraPartsAmount, lang)}/ชิ้น)`;
+    els.depositNote.textContent = lang === 'en'
+      ? `Minimum ${formatMoney(300, lang)}`
+      : 'ขั้นต่ำ 300 บาท';
+  }
+
+  function syncDepositInputCurrency(lang: PriceLanguage) {
+    const currentCurrency = (els.deposit.dataset.currency as PriceLanguage | undefined) || 'th';
+    els.deposit.min = lang === 'en' ? String(Math.max(1, Math.round(thbToUsd(300)))) : '300';
+    els.deposit.step = lang === 'en' ? '1' : '100';
+
+    if (currentCurrency === lang) return;
+
+    const currentValue = Number(els.deposit.value) || 0;
+    const currentThbValue = currentCurrency === 'en' ? usdToThb(currentValue) : currentValue;
+    els.deposit.value = lang === 'en'
+      ? String(Math.max(1, Math.round(thbToUsd(currentThbValue))))
+      : String(Math.round(currentThbValue));
+    els.deposit.dataset.currency = lang;
+  }
+
+  function getInput(lang: PriceLanguage): CalculatorInput {
+    const depositAmount = Number(els.deposit.value) || (lang === 'en' ? thbToUsd(300) : 300);
+
     return {
       workTypeId: els.workType.value,
       colorMode: getSelectedColor(),
@@ -87,13 +146,18 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       wantSourceFile: els.sourceFile.checked,
       wantRigging: els.rigging.checked,
       extraPartsCount: Number(els.extraParts.value) || 0,
-      depositAmount: Number(els.deposit.value) || 300,
+      depositAmount: lang === 'en' ? usdToThb(depositAmount) : depositAmount,
     };
   }
 
   function render() {
-    const input = getInput();
-    const result = calculatePrice(input);
+    const lang = getLanguage();
+    const text = i18n[lang];
+    updateLocalizedOptions(lang);
+    updateLocalizedPriceHints(lang);
+    syncDepositInputCurrency(lang);
+    const input = getInput(lang);
+    const result = calculatePrice(input, lang);
     const wt = workTypes.find(w => w.id === input.workTypeId);
 
     // Toggle color mode visibility
@@ -130,12 +194,12 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     }
 
     // Update total
-    els.total.textContent = formatMoney(result.total);
-    els.range.textContent = `${formatMoney(result.low)} – ${formatMoney(result.high)} หลังดูบรีฟจริง`;
+    els.total.textContent = formatMoney(result.total, lang);
+    els.range.textContent = `${formatMoney(result.low, lang)} – ${formatMoney(result.high, lang)} ${text['price.range.afterBrief']}`;
 
     // Update breakdown
     els.breakdown.innerHTML = result.breakdown
-      .map(item => `<li class="flex justify-between gap-3 py-2.5 text-sm"><span class="text-muted">${item.label}</span><strong class="text-ink whitespace-nowrap">${formatMoney(item.amount)}</strong></li>`)
+      .map(item => `<li class="flex justify-between gap-3 py-2.5 text-sm"><span class="text-muted">${item.label}</span><strong class="text-ink whitespace-nowrap">${formatMoney(item.amount, lang)}</strong></li>`)
       .join('');
 
     // Policy guard
@@ -144,10 +208,10 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
 
     if (blockedByPolicy) {
       els.policyGuard.className = 'mt-3 p-3 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-800 leading-relaxed';
-      els.policyGuard.textContent = 'งานสำหรับผู้ใหญ่ต้องยืนยันว่าตัวละครทุกตัวเป็น 18+ ก่อนคัดลอกบรีฟ';
+      els.policyGuard.textContent = text['price.policy.adult'];
     } else {
       els.policyGuard.className = 'mt-3 p-3 rounded-xl border border-green-200 bg-green-50 text-sm text-green-800 leading-relaxed';
-      els.policyGuard.textContent = 'ระบบนี้ใช้ประเมินราคาเบื้องต้น ราคาอาจปรับเปลี่ยนได้หลังดูบรีฟจริง';
+      els.policyGuard.textContent = text['price.policy.normal'];
     }
 
     // Build brief
@@ -159,9 +223,10 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
         isAdult: input.isAdult,
         adultConfirmed: input.adultConfirmed,
       },
-      result
+      result,
+      lang
     );
-    els.briefPreview.textContent = brief || 'ยืนยันนโยบายผู้ใหญ่เพื่อดูบรีฟ';
+    els.briefPreview.textContent = brief || text['price.policy.adultBrief'];
   }
 
   // ─── Event listeners ───
@@ -180,8 +245,8 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     const text = els.briefPreview.textContent || '';
     try {
       await navigator.clipboard.writeText(text);
-      els.copyBtn.textContent = '✓ คัดลอกแล้ว!';
-      setTimeout(() => { els.copyBtn.textContent = 'คัดลอกบรีฟ'; }, 1500);
+      els.copyBtn.textContent = getText(getLanguage(), 'price.btn.copied');
+      setTimeout(() => { els.copyBtn.textContent = getText(getLanguage(), 'price.btn.copy'); }, 1500);
     } catch {
       // Fallback
       const ta = document.createElement('textarea');
@@ -190,8 +255,8 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      els.copyBtn.textContent = '✓ คัดลอกแล้ว!';
-      setTimeout(() => { els.copyBtn.textContent = 'คัดลอกบรีฟ'; }, 1500);
+      els.copyBtn.textContent = getText(getLanguage(), 'price.btn.copied');
+      setTimeout(() => { els.copyBtn.textContent = getText(getLanguage(), 'price.btn.copy'); }, 1500);
     }
   });
 
@@ -210,12 +275,15 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     els.rigging.checked = false;
     els.sourceFile.checked = false;
     els.extraParts.value = '0';
+    els.deposit.dataset.currency = 'th';
     els.deposit.value = '300';
     els.notes.value = '';
     els.projectTitle.value = 'Commission artwork';
     els.clientName.value = '';
     render();
   });
+
+  window.addEventListener('languageChanged', render);
 
   // Initial render
   render();

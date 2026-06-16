@@ -83,7 +83,16 @@ export interface PriceResult {
   };
 }
 
-export function calculatePrice(input: CalculatorInput): PriceResult {
+export type PriceLanguage = 'th' | 'en';
+
+function labelFor(
+  item: { label: string; labelTh: string },
+  lang: PriceLanguage,
+): string {
+  return lang === 'en' ? item.label : item.labelTh;
+}
+
+export function calculatePrice(input: CalculatorInput, lang: PriceLanguage = 'th'): PriceResult {
   // ─── Step 0: Resolve configs ───
   const workType = workTypes.find((w) => w.id === input.workTypeId) ?? workTypes[0];
   const complexity = complexityOptions.find((c) => c.id === input.complexityId) ?? complexityOptions[1];
@@ -153,16 +162,55 @@ export function calculatePrice(input: CalculatorInput): PriceResult {
   const colorLabel = (input.colorMode === 'bw' && workType.hasColorChoice) ? 'B/W' : 'Full Color';
 
   breakdown.push({ label: `${workType.label} / ${colorLabel}`, amount: base });
-  if (characterFee > 0) breakdown.push({ label: `ตัวละครเพิ่ม ×${characterCount - 1}`, amount: characterFee });
-  if (complexityFee > 0) breakdown.push({ label: `ดีเทล ${complexity.labelTh}`, amount: complexityFee });
-  if (backgroundFee > 0) breakdown.push({ label: background.labelTh, amount: backgroundFee });
-  if (adultFee > 0) breakdown.push({ label: 'เนื้อหาสำหรับผู้ใหญ่ (+20%)', amount: adultFee });
-  if (live2dFee > 0) breakdown.push({ label: 'แยกพาร์ต Live2D (+50%)', amount: live2dFee });
-  if (commercialFee > 0) breakdown.push({ label: 'สิทธิ์เชิงพาณิชย์ (×2)', amount: commercialFee });
-  if (rushFee > 0) breakdown.push({ label: rush.labelTh, amount: rushFee });
-  if (sourceFileFee > 0) breakdown.push({ label: 'ไฟล์ PSD / Source File', amount: sourceFileFee });
+  if (characterFee > 0) {
+    breakdown.push({
+      label: lang === 'en'
+        ? `Additional character x${characterCount - 1}`
+        : `ตัวละครเพิ่ม ×${characterCount - 1}`,
+      amount: characterFee,
+    });
+  }
+  if (complexityFee > 0) {
+    breakdown.push({
+      label: lang === 'en'
+        ? `Character detail: ${complexity.label}`
+        : `ดีเทล ${complexity.labelTh}`,
+      amount: complexityFee,
+    });
+  }
+  if (backgroundFee > 0) breakdown.push({ label: labelFor(background, lang), amount: backgroundFee });
+  if (adultFee > 0) {
+    breakdown.push({
+      label: lang === 'en' ? 'Adult content (18+) (+20%)' : 'เนื้อหาสำหรับผู้ใหญ่ (+20%)',
+      amount: adultFee,
+    });
+  }
+  if (live2dFee > 0) {
+    breakdown.push({
+      label: lang === 'en' ? 'Live2D part separation (+50%)' : 'แยกพาร์ต Live2D (+50%)',
+      amount: live2dFee,
+    });
+  }
+  if (commercialFee > 0) {
+    breakdown.push({
+      label: lang === 'en' ? 'Commercial use (x2)' : 'สิทธิ์เชิงพาณิชย์ (×2)',
+      amount: commercialFee,
+    });
+  }
+  if (rushFee > 0) breakdown.push({ label: labelFor(rush, lang), amount: rushFee });
+  if (sourceFileFee > 0) {
+    breakdown.push({
+      label: lang === 'en' ? 'PSD source file' : 'ไฟล์ PSD / Source File',
+      amount: sourceFileFee,
+    });
+  }
   if (riggingFee > 0) breakdown.push({ label: 'Rigging', amount: riggingFee });
-  if (extraPartsFee > 0) breakdown.push({ label: `ชิ้นส่วนเพิ่ม ×${input.extraPartsCount}`, amount: extraPartsFee });
+  if (extraPartsFee > 0) {
+    breakdown.push({
+      label: lang === 'en' ? `Extra parts x${input.extraPartsCount}` : `ชิ้นส่วนเพิ่ม ×${input.extraPartsCount}`,
+      amount: extraPartsFee,
+    });
+  }
 
   return {
     workType,
@@ -189,9 +237,9 @@ export function calculatePrice(input: CalculatorInput): PriceResult {
     labels: {
       workType: workType.label,
       colorMode: colorLabel,
-      complexity: complexity.labelTh,
-      background: background.labelTh,
-      rush: rush.labelTh,
+      complexity: labelFor(complexity, lang),
+      background: labelFor(background, lang),
+      rush: labelFor(rush, lang),
     },
   };
 }

@@ -2,17 +2,28 @@
 // PriceBreakdown — rendered server-side, updated client-side via JS
 ---
 
-<aside class="lg:sticky lg:top-20 rounded-2xl border border-line bg-white shadow-xl overflow-hidden" id="price-panel" aria-label="ราคารวม">
+<aside
+  class="lg:sticky lg:top-20 rounded-2xl border border-line bg-white shadow-xl overflow-hidden"
+  id="price-panel"
+  aria-label="ราคารวม"
+  data-i18n-aria-label="price.panel.aria"
+>
   <!-- Preview area -->
-  <div class="h-32 bg-gradient-to-br from-secondary via-secondary-light to-white flex items-center justify-center">
-    <div class="w-14 h-14 rounded-xl bg-primary/10 text-primary grid place-items-center font-extrabold text-2xl">G</div>
+  <div class="h-32 bg-gradient-to-br from-secondary via-secondary-light to-white flex items-center justify-center overflow-hidden">
+    <img
+      src="/images/hero/hero.png"
+      alt=""
+      aria-hidden="true"
+      class="h-full w-full object-cover object-center"
+      loading="lazy"
+    />
   </div>
 
   <div class="p-5">
     <!-- Total -->
-    <p class="text-xs font-bold text-muted uppercase tracking-wide mb-1">ราคารวมโดยประมาณ</p>
+    <p class="text-xs font-bold text-muted uppercase tracking-wide mb-1" data-i18n="price.total.label">ราคารวมโดยประมาณ</p>
     <p class="text-4xl font-extrabold text-primary leading-none mb-2" id="calc-total">฿0</p>
-    <p class="text-sm text-muted" id="calc-range">เลือกตัวเลือกเพื่อเริ่มประเมินราคา</p>
+    <p class="text-sm text-muted" id="calc-range" data-i18n="price.range.default">เลือกตัวเลือกเพื่อเริ่มประเมินราคา</p>
 
     <!-- Breakdown list -->
     <ul class="mt-4 border-t border-line divide-y divide-line" id="calc-breakdown"></ul>
@@ -23,6 +34,7 @@
         type="button"
         id="copy-brief-btn"
         class="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary-light transition-colors disabled:bg-muted/30 disabled:cursor-not-allowed"
+        data-i18n="price.btn.copy"
       >
         คัดลอกบรีฟ
       </button>
@@ -31,6 +43,9 @@
         id="reset-calc-btn"
         class="w-11 h-11 rounded-xl border border-line bg-white text-muted hover:text-primary hover:bg-secondary-light transition-colors grid place-items-center"
         title="รีเซ็ต"
+        aria-label="รีเซ็ต"
+        data-i18n-title="price.btn.reset"
+        data-i18n-aria-label="price.btn.reset"
       >
         ↺
       </button>
@@ -43,11 +58,11 @@
     ></div>
 
     <!-- Policy guard -->
-    <div id="policy-guard" class="mt-3 p-3 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-800 leading-relaxed">
+    <div id="policy-guard" class="mt-3 p-3 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-800 leading-relaxed" data-i18n="price.policy.normal">
       ระบบนี้ใช้ประเมินราคาเบื้องต้น ราคาอาจปรับเปลี่ยนได้หลังดูบรีฟจริง
     </div>
 
-    <p class="mt-3 text-xs text-muted leading-relaxed">
+    <p class="mt-3 text-xs text-muted leading-relaxed" data-i18n="price.note">
       ราคานี้เป็นราคาเริ่มต้นสำหรับคัดกรอง requirement ก่อนคุยรายละเอียดจริง
     </p>
   </div>

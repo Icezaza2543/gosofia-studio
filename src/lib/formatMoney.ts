@@ -1,15 +1,35 @@
 // ─── Money Formatting Utility ───
 
-const formatter = new Intl.NumberFormat('th-TH', {
+export type MoneyLanguage = 'th' | 'en';
+
+export const THB_PER_USD = 32.5;
+
+const thaiFormatter = new Intl.NumberFormat('th-TH', {
   style: 'currency',
   currency: 'THB',
   maximumFractionDigits: 0,
 });
 
+const englishFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
+export function thbToUsd(amount: number): number {
+  return amount / THB_PER_USD;
+}
+
+export function usdToThb(amount: number): number {
+  return amount * THB_PER_USD;
+}
+
 /**
- * Format a number as Thai Baht currency string.
+ * Format a THB-denominated amount for the active display language.
  * Example: formatMoney(1200) → "฿1,200"
  */
-export function formatMoney(amount: number): string {
-  return formatter.format(amount);
+export function formatMoney(amount: number, lang: MoneyLanguage = 'th'): string {
+  return lang === 'en'
+    ? englishFormatter.format(thbToUsd(amount)).replace(/\s+/g, ' ')
+    : thaiFormatter.format(amount);
 }
