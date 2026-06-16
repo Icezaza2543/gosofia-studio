@@ -41,3 +41,15 @@ Since there is no database in the MVP, all data is stored statically in TypeScri
 
 ## Author
 Gosofia (โกโซเฟีย)
+
+## License & Copyright
+
+This repository is public for transparency and deployment only. It is not open source.
+
+All rights are reserved. No permission is granted to copy, modify, redistribute, reuse, sublicense, sell, host, deploy, scrape, train on, or create derivative works from this repository, its source code, its design, its content, its images, or any other project asset unless separate written permission is granted by the relevant rights holder.
+
+- Website source code and implementation: Copyright © Icezaza Ch. All rights reserved.
+- Artwork, portfolio images, artist branding, commission samples, and Gosofia-related content: Copyright © Gosofia / โกโซเฟีย and/or respective rights holders. All rights reserved.
+- Third-party dependencies remain under their own licenses.
+
+See [`LICENSE`](./LICENSE) for the full proprietary license and copyright notice.
