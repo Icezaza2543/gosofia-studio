@@ -2,7 +2,9 @@
 // Generates a copyable text summary for clients to send to the artist.
 
 import { formatMoney } from './formatMoney';
+import { DOUJIN_PAGE_PRICE_THB, DOUJIN_PAGE_PRICE_USD } from '../data/pricing';
 import type { PriceLanguage, PriceResult } from './calculatePrice';
+import { currencyForLanguage, getCurrencyAmount, type Currency } from './currency';
 
 export interface BriefInput {
   projectTitle: string;
@@ -26,7 +28,8 @@ const briefText = {
     detail: 'ดีเทล',
     background: 'ฉาก',
     rush: 'กำหนดส่ง',
-    doujinNotice: 'หน้าเนื้อหาโดจินขาวดำเท่านั้น (450 บาท/หน้า)',
+    doujinNotice: 'หน้าเนื้อหาโดจินขาวดำเท่านั้น',
+    pageUnit: 'หน้า',
     pages: 'จำนวนหน้า',
     coverOption: 'หน้าปก',
     adultNote: 'หมายเหตุ: เนื้อหาสำหรับผู้ใหญ่ — ยืนยันว่าตัวละครทุกตัวเป็น 18+ เท่านั้น',
@@ -51,7 +54,8 @@ const briefText = {
     detail: 'Character detail',
     background: 'Background',
     rush: 'Deadline',
-    doujinNotice: 'Doujin inner pages are B/W only (450 THB/page)',
+    doujinNotice: 'Doujin inner pages are B/W only',
+    pageUnit: 'page',
     pages: 'Page count',
     coverOption: 'Cover',
     adultNote: 'Note: Adult content (18+) — all characters are confirmed to be 18+ only.',
@@ -72,13 +76,19 @@ const briefText = {
  * Build a copyable commission brief text.
  * Returns null if adult option is selected but not confirmed.
  */
-export function buildBrief(input: BriefInput, result: PriceResult, lang: PriceLanguage = 'th'): string | null {
+export function buildBrief(
+  input: BriefInput,
+  result: PriceResult,
+  lang: PriceLanguage = 'th',
+  currency: Currency = currencyForLanguage(lang),
+): string | null {
   // Block brief generation if adult option is on but not confirmed
   if (input.isAdult && !input.adultConfirmed) {
     return null;
   }
 
   const text = briefText[lang];
+  const doujinPagePrice = getCurrencyAmount(DOUJIN_PAGE_PRICE_THB, DOUJIN_PAGE_PRICE_USD, currency) ?? 0;
 
   const lines: string[] = [
     `━━━ ${text.title} ━━━`,
@@ -92,7 +102,7 @@ export function buildBrief(input: BriefInput, result: PriceResult, lang: PriceLa
   if (result.workType?.id === 'doujin') {
     lines.push(
       `${text.pages}: ${input.doujinPages || 1}`,
-      `${text.doujinNotice}`,
+      `${text.doujinNotice} (${formatMoney(doujinPagePrice, currency)}/${text.pageUnit})`,
       `${text.coverOption}: ${input.wantCover ? (lang === 'en' ? 'Yes' : 'รับหน้าปก') : (lang === 'en' ? 'No cover' : 'ไม่รับหน้าปก')}`,
     );
     if (input.wantCover) {
@@ -120,17 +130,17 @@ export function buildBrief(input: BriefInput, result: PriceResult, lang: PriceLa
   // Price breakdown
   lines.push(`━━━ ${text.breakdown} ━━━`);
   for (const item of result.breakdown) {
-    lines.push(`• ${item.label}: ${formatMoney(item.amount, lang)}`);
+    lines.push(`• ${item.label}: ${formatMoney(item.amount, currency)}`);
   }
 
   lines.push(``);
   lines.push(`━━━ ${text.summary} ━━━`);
-  lines.push(`${text.total}: ${formatMoney(result.total, lang, { applyUsdMarkup: true })}`);
-  lines.push(`${text.range}: ${formatMoney(result.low, lang, { applyUsdMarkup: true })} – ${formatMoney(result.high, lang, { applyUsdMarkup: true })}`);
+  lines.push(`${text.total}: ${formatMoney(result.total, currency)}`);
+  lines.push(`${text.range}: ${formatMoney(result.low, currency)} – ${formatMoney(result.high, currency)}`);
   lines.push(``);
   lines.push(`━━━ ${text.payment} ━━━`);
-  lines.push(`${text.deposit}: ${formatMoney(result.deposit, lang, { applyUsdMarkup: true })}`);
-  lines.push(`${text.balance}: ${formatMoney(result.balance, lang, { applyUsdMarkup: true })}`);
+  lines.push(`${text.deposit}: ${formatMoney(result.deposit, currency)}`);
+  lines.push(`${text.balance}: ${formatMoney(result.balance, currency)}`);
   lines.push(`${text.methods}: Stripe (PromptPay / card), Wise, Ko-fi`);
   lines.push(``);
   lines.push(text.finalNote);

@@ -34,8 +34,9 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
   import { calculatePrice, type CalculatorInput, type PriceLanguage } from '../lib/calculatePrice';
   import { buildBrief } from '../lib/buildBrief';
   import { formatMoney } from '../lib/formatMoney';
+  import { currencyForLanguage, type Currency } from '../lib/currency';
   import { i18n, type Language } from '../data/i18n';
-  import { workTypes } from '../data/pricing';
+  import { MINIMUM_DEPOSIT, MINIMUM_DEPOSIT_USD, workTypes } from '../data/pricing';
 
   // ─── DOM references ───
   const els = {
@@ -88,62 +89,68 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     return savedLang === 'en' || docLang === 'en' ? 'en' : 'th';
   }
 
+  function getCurrency(lang: PriceLanguage = getLanguage()): Currency {
+    return currencyForLanguage(lang);
+  }
+
+  function getMinimumDeposit(currency: Currency): number {
+    return currency === 'USD' ? MINIMUM_DEPOSIT_USD : MINIMUM_DEPOSIT;
+  }
+
   function getText(lang: PriceLanguage, key: keyof typeof i18n.th): string {
     return i18n[lang][key] ?? i18n.th[key];
   }
 
   function updateLocalizedOptions(lang: PriceLanguage) {
+    const currency = getCurrency(lang);
     [els.complexity, els.background, els.rush].forEach((select) => {
       select.querySelectorAll<HTMLOptionElement>('option').forEach((option) => {
         const label = option.dataset[lang === 'en' ? 'labelEn' : 'labelTh'] || option.textContent || '';
-        const surcharge = Number(option.dataset[lang === 'en' ? 'surchargeUsd' : 'surcharge']) || 0;
-        option.textContent = surcharge > 0 ? `${label} (+${formatMoney(surcharge, lang)})` : label;
+        const surcharge = Number(option.dataset[currency === 'USD' ? 'surchargeUsd' : 'surcharge']) || 0;
+        option.textContent = surcharge > 0 ? `${label} (+${formatMoney(surcharge, currency)})` : label;
       });
     });
   }
 
   function updateLocalizedPriceHints(lang: PriceLanguage) {
-    const riggingAmount = Number(els.riggingNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
-    const sourceFileAmount = Number(els.sourceFileNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
-    const extraPartsAmount = Number(els.extraPartsNote.dataset[lang === 'en' ? 'amountUsd' : 'amount']) || 0;
+    const currency = getCurrency(lang);
+    const riggingAmount = Number(els.riggingNote.dataset[currency === 'USD' ? 'amountUsd' : 'amount']) || 0;
+    const sourceFileAmount = Number(els.sourceFileNote.dataset[currency === 'USD' ? 'amountUsd' : 'amount']) || 0;
+    const extraPartsAmount = Number(els.extraPartsNote.dataset[currency === 'USD' ? 'amountUsd' : 'amount']) || 0;
+    const minimumDeposit = getMinimumDeposit(currency);
 
-    els.riggingNote.textContent = `(+${formatMoney(riggingAmount, lang)})`;
+    els.riggingNote.textContent = `(+${formatMoney(riggingAmount, currency)})`;
     els.sourceFileNote.textContent = lang === 'en'
-      ? `(Vtuber only +${formatMoney(sourceFileAmount, lang)})`
-      : `(Vtuber เท่านั้น +${formatMoney(sourceFileAmount, lang)})`;
+      ? `(Vtuber only +${formatMoney(sourceFileAmount, currency)})`
+      : `(Vtuber เท่านั้น +${formatMoney(sourceFileAmount, currency)})`;
     els.extraPartsNote.textContent = lang === 'en'
-      ? `(+${formatMoney(extraPartsAmount, lang)}/part)`
-      : `(+${formatMoney(extraPartsAmount, lang)}/ชิ้น)`;
+      ? `(+${formatMoney(extraPartsAmount, currency)}/part)`
+      : `(+${formatMoney(extraPartsAmount, currency)}/ชิ้น)`;
     els.depositNote.textContent = lang === 'en'
-      ? `Minimum ${formatMoney(10, lang)}`
-      : `ขั้นต่ำ ${formatMoney(300, lang)}`;
+      ? `Minimum ${formatMoney(minimumDeposit, currency)}`
+      : `ขั้นต่ำ ${formatMoney(minimumDeposit, currency)}`;
   }
 
   function syncDepositInputCurrency(lang: PriceLanguage) {
-    const currentCurrency = (els.deposit.dataset.currency as PriceLanguage | undefined) || 'th';
-    els.deposit.min = lang === 'en' ? '10' : '300';
-    els.deposit.step = lang === 'en' ? '1' : '100';
+    const currency = getCurrency(lang);
+    const currentCurrency = (els.deposit.dataset.currency as Currency | undefined) || 'THB';
+    const minimumDeposit = getMinimumDeposit(currency);
+    els.deposit.min = String(minimumDeposit);
+    els.deposit.step = currency === 'USD' ? '1' : '100';
 
-    if (currentCurrency === lang) return;
-
-    // Use a fixed rough conversion just for UI convenience when toggling language
-    const UI_CONVERSION_RATE = 32.5;
-    const currentValue = Number(els.deposit.value) || 0;
-    const currentThbValue = currentCurrency === 'en' ? currentValue * UI_CONVERSION_RATE : currentValue;
-    
-    let newValue;
-    if (lang === 'en') {
-      newValue = Math.max(10, Math.round(currentThbValue / UI_CONVERSION_RATE));
-    } else {
-      newValue = Math.max(300, Math.round(currentThbValue));
+    if (currentCurrency !== currency) {
+      els.deposit.value = String(minimumDeposit);
+      els.deposit.dataset.currency = currency;
+      return;
     }
-    
-    els.deposit.value = String(newValue);
-    els.deposit.dataset.currency = lang;
+
+    if ((Number(els.deposit.value) || 0) < minimumDeposit) {
+      els.deposit.value = String(minimumDeposit);
+    }
   }
 
-  function getInput(lang: PriceLanguage): CalculatorInput {
-    const minD = lang === 'en' ? 10 : 300;
+  function getInput(lang: PriceLanguage, currency: Currency): CalculatorInput {
+    const minD = getMinimumDeposit(currency);
     const depositAmount = Number(els.deposit.value) || minD;
 
     return {
@@ -160,7 +167,7 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
       wantSourceFile: els.sourceFile.checked,
       wantRigging: els.rigging.checked,
       extraPartsCount: Number(els.extraParts.value) || 0,
-      depositAmount: lang === 'en' ? usdToThb(depositAmount) : depositAmount,
+      depositAmount,
       doujinPages: Number(els.doujinPages.value) || 1,
       wantCover: els.wantCover.checked,
       coverScaleId: els.coverScale.value,
@@ -169,12 +176,13 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
 
   function render() {
     const lang = getLanguage();
+    const currency = getCurrency(lang);
     const text = i18n[lang];
     updateLocalizedOptions(lang);
     updateLocalizedPriceHints(lang);
     syncDepositInputCurrency(lang);
-    const input = getInput(lang);
-    const result = calculatePrice(input, lang);
+    const input = getInput(lang, currency);
+    const result = calculatePrice(input, lang, currency);
     const wt = workTypes.find(w => w.id === input.workTypeId);
 
     // Toggle Doujin fields
@@ -242,12 +250,12 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     }
 
     // Update total
-    els.total.textContent = formatMoney(result.total, lang);
-    els.range.textContent = `${formatMoney(result.low, lang)} – ${formatMoney(result.high, lang)} ${text['price.range.afterBrief']}`;
+    els.total.textContent = formatMoney(result.total, currency);
+    els.range.textContent = `${formatMoney(result.low, currency)} – ${formatMoney(result.high, currency)} ${text['price.range.afterBrief']}`;
 
     // Update breakdown
     els.breakdown.innerHTML = result.breakdown
-      .map(item => `<li class="flex justify-between gap-3 py-2.5 text-sm"><span class="text-muted">${item.label}</span><strong class="text-ink whitespace-nowrap">${formatMoney(item.amount, lang)}</strong></li>`)
+      .map(item => `<li class="flex justify-between gap-3 py-2.5 text-sm"><span class="text-muted">${item.label}</span><strong class="text-ink whitespace-nowrap">${formatMoney(item.amount, currency)}</strong></li>`)
       .join('');
 
     // Policy guard
@@ -272,7 +280,8 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
         adultConfirmed: input.adultConfirmed,
       },
       result,
-      lang
+      lang,
+      currency
     );
     els.briefPreview.textContent = brief || text['price.policy.adultBrief'];
   }
@@ -326,8 +335,9 @@ import PriceBreakdown from '../components/PriceBreakdown.astro';
     els.rigging.checked = false;
     els.sourceFile.checked = false;
     els.extraParts.value = '0';
-    els.deposit.dataset.currency = 'th';
-    els.deposit.value = '300';
+    const currency = getCurrency();
+    els.deposit.dataset.currency = currency;
+    els.deposit.value = String(getMinimumDeposit(currency));
     els.notes.value = '';
     els.projectTitle.value = 'Commission artwork';
     els.clientName.value = '';

@@ -1,6 +1,6 @@
 // ─── Money Formatting Utility ───
 
-export type MoneyLanguage = 'th' | 'en';
+import type { Currency } from './currency';
 
 const thaiFormatter = new Intl.NumberFormat('th-TH', {
   style: 'currency',
@@ -15,13 +15,13 @@ const englishFormatter = new Intl.NumberFormat('en-US', {
 });
 
 /**
- * Format an amount for the active display language.
- * Uses explicitly provided USD amounts for English.
- * Example: formatMoney(1200, 'th') → "฿1,200"
- * Example: formatMoney(50, 'en') → "$50"
+ * Format an already-correct currency-local amount.
+ * This function never converts values or chooses pricing fields.
+ * Example: formatMoney(1200, 'THB') → "฿1,200"
+ * Example: formatMoney(50, 'USD') → "$50"
  */
-export function formatMoney(amount: number, lang: MoneyLanguage = 'th'): string {
-  if (lang === 'en') {
+export function formatMoney(amount: number, currency: Currency = 'THB'): string {
+  if (currency === 'USD') {
     return englishFormatter.format(amount).replace(/\s+/g, ' ');
   }
   return thaiFormatter.format(amount);

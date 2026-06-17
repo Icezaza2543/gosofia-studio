@@ -34,6 +34,7 @@ import {
   DOUJIN_PAGE_PRICE_USD,
   type WorkTypeConfig,
 } from '../data/pricing';
+import { currencyForLanguage, getCurrencyAmount, type Currency } from './currency';
 
 export interface CalculatorInput {
   workTypeId: string;
@@ -95,6 +96,14 @@ export interface PriceResult {
 
 export type PriceLanguage = 'th' | 'en';
 
+function amountForCurrency(
+  thb: number | null,
+  usd: number | null,
+  currency: Currency,
+): number {
+  return getCurrencyAmount(thb, usd, currency) ?? 0;
+}
+
 function labelFor(
   item: { label: string; labelTh: string },
   lang: PriceLanguage,
@@ -102,18 +111,24 @@ function labelFor(
   return lang === 'en' ? item.label : item.labelTh;
 }
 
-export function calculatePrice(input: CalculatorInput, lang: PriceLanguage = 'th'): PriceResult {
+export function calculatePrice(
+  input: CalculatorInput,
+  lang: PriceLanguage = 'th',
+  currency: Currency = currencyForLanguage(lang),
+): PriceResult {
   if (input.workTypeId === 'doujin') {
-    return calculateDoujinPrice(input, lang);
+    return calculateDoujinPrice(input, lang, currency);
   }
-  return calculateIllustrationPrice(input, lang, { includeGlobalModifiers: true });
+  return calculateIllustrationPrice(input, lang, { includeGlobalModifiers: true, currency });
 }
 
 export function calculateIllustrationPrice(
   input: CalculatorInput, 
   lang: PriceLanguage, 
-  options: { includeGlobalModifiers: boolean }
+  options: { includeGlobalModifiers: boolean; currency?: Currency }
 ): PriceResult {
+  const currency = options.currency ?? currencyForLanguage(lang);
+
   // ─── Step 0: Resolve configs ───
   const workType = workTypes.find((w) => w.id === input.workTypeId) ?? workTypes[0];
   const complexity = complexityOptions.find((c) => c.id === input.complexityId) ?? complexityOptions[1];
@@ -121,14 +136,16 @@ export function calculateIllustrationPrice(
   const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
 
   // ─── Step 1: Art subtotal ───
-  const base = lang === 'en'
-    ? (input.colorMode === 'bw' && workType.bwUsd !== null ? workType.bwUsd : workType.colorUsd)
-    : (input.colorMode === 'bw' && workType.bw !== null ? workType.bw : workType.color);
+  const bwBase = getCurrencyAmount(workType.bw, workType.bwUsd, currency);
+  const colorBase = getCurrencyAmount(workType.color, workType.colorUsd, currency);
+  const base = input.colorMode === 'bw' && bwBase !== null
+    ? bwBase
+    : (colorBase ?? bwBase ?? 0);
 
   const characterCount = Math.max(1, Math.min(6, input.characterCount));
   const characterFee = (characterCount - 1) * base;
-  const complexityFee = lang === 'en' ? complexity.surchargeUsd : complexity.surcharge;
-  const backgroundFee = lang === 'en' ? (background.surchargeUsd ?? 0) : (background.surcharge ?? 0);
+  const complexityFee = amountForCurrency(complexity.surcharge, complexity.surchargeUsd, currency);
+  const backgroundFee = amountForCurrency(background.surcharge, background.surchargeUsd, currency);
   const artSubtotal = base + characterFee + complexityFee + backgroundFee;
 
   let adultFee = 0;
@@ -145,10 +162,15 @@ export function calculateIllustrationPrice(
     const adjustedArt = artSubtotal + adultFee + live2dFee;
     commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
     
-    rushFee = lang === 'en' ? (rush.surchargeUsd ?? 0) : (rush.surcharge ?? 0);
-    sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber') ? (lang === 'en' ? SOURCE_FILE_PRICE_USD : SOURCE_FILE_PRICE) : 0;
-    riggingFee = input.wantRigging ? (lang === 'en' ? RIGGING_BASE_PRICE_USD : RIGGING_BASE_PRICE) : 0;
-    extraPartsFee = Math.max(0, input.extraPartsCount) * (lang === 'en' ? EXTRA_PARTS_PRICE_USD : EXTRA_PARTS_PRICE);
+    rushFee = amountForCurrency(rush.surcharge, rush.surchargeUsd, currency);
+    sourceFileFee = (input.wantSourceFile && workType.id === 'vtuber')
+      ? amountForCurrency(SOURCE_FILE_PRICE, SOURCE_FILE_PRICE_USD, currency)
+      : 0;
+    riggingFee = input.wantRigging
+      ? amountForCurrency(RIGGING_BASE_PRICE, RIGGING_BASE_PRICE_USD, currency)
+      : 0;
+    extraPartsFee = Math.max(0, input.extraPartsCount)
+      * amountForCurrency(EXTRA_PARTS_PRICE, EXTRA_PARTS_PRICE_USD, currency);
   }
 
   const adjustedArt = artSubtotal + adultFee + live2dFee;
@@ -157,14 +179,14 @@ export function calculateIllustrationPrice(
 
   const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR))));
   const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)));
-  const minDeposit = lang === 'en' ? MINIMUM_DEPOSIT_USD : MINIMUM_DEPOSIT;
+  const minDeposit = amountForCurrency(MINIMUM_DEPOSIT, MINIMUM_DEPOSIT_USD, currency);
   const deposit = Math.min(total, Math.max(minDeposit, input.depositAmount));
   const balance = Math.max(0, total - deposit);
 
   const breakdown: BreakdownItem[] = [];
   const colorLabel = (input.colorMode === 'bw' && workType.hasColorChoice) ? 'B/W' : 'Full Color';
 
-  breakdown.push({ label: `${workType.label} / ${colorLabel}`, amount: base });
+  breakdown.push({ label: `${labelFor(workType, lang)} / ${colorLabel}`, amount: base });
   if (characterFee > 0) {
     breakdown.push({
       label: lang === 'en' ? `Additional character x${characterCount - 1}` : `ตัวละครเพิ่ม ×${characterCount - 1}`,
@@ -193,7 +215,7 @@ export function calculateIllustrationPrice(
     workType, base, characterFee, complexityFee, backgroundFee, artSubtotal, adultFee, live2dFee, adjustedArt,
     commercialFee, rushFee, sourceFileFee, riggingFee, extraPartsFee, flatFees, total, low, high, deposit, balance, breakdown,
     labels: {
-      workType: workType.label,
+      workType: labelFor(workType, lang),
       colorMode: colorLabel,
       complexity: labelFor(complexity, lang),
       background: labelFor(background, lang),
@@ -202,9 +224,13 @@ export function calculateIllustrationPrice(
   };
 }
 
-export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage): PriceResult {
+export function calculateDoujinPrice(
+  input: CalculatorInput,
+  lang: PriceLanguage,
+  currency: Currency = currencyForLanguage(lang),
+): PriceResult {
   const doujinPages = Math.max(1, input.doujinPages);
-  const pagePrice = lang === 'en' ? DOUJIN_PAGE_PRICE_USD : DOUJIN_PAGE_PRICE_THB;
+  const pagePrice = amountForCurrency(DOUJIN_PAGE_PRICE_THB, DOUJIN_PAGE_PRICE_USD, currency);
   const innerSubtotal = doujinPages * pagePrice;
   
   const doujinWorkType = workTypes.find(w => w.id === 'doujin')!;
@@ -220,7 +246,7 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
 
   if (input.wantCover) {
     const coverInput = { ...input, workTypeId: input.coverScaleId };
-    coverResult = calculateIllustrationPrice(coverInput, lang, { includeGlobalModifiers: false });
+    coverResult = calculateIllustrationPrice(coverInput, lang, { includeGlobalModifiers: false, currency });
     coverArtSubtotal = coverResult.artSubtotal;
     
     // Prefix cover items
@@ -242,7 +268,7 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
   const commercialFee = input.isCommercial ? Math.round(adjustedArt * (COMMERCIAL_MULTIPLIER - 1)) : 0;
   
   const rush = rushOptions.find((r) => r.id === input.rushId) ?? rushOptions[0];
-  const rushFee = lang === 'en' ? (rush.surchargeUsd ?? 0) : (rush.surcharge ?? 0);
+  const rushFee = amountForCurrency(rush.surcharge, rush.surchargeUsd, currency);
   const flatFees = rushFee;
   
   const total = adjustedArt + commercialFee + flatFees;
@@ -254,7 +280,7 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
 
   const low = Math.max(0, Math.round((total * (1 - RANGE_LOW_FACTOR))));
   const high = Math.round((total * (1 + RANGE_HIGH_FACTOR)));
-  const minDeposit = lang === 'en' ? MINIMUM_DEPOSIT_USD : MINIMUM_DEPOSIT;
+  const minDeposit = amountForCurrency(MINIMUM_DEPOSIT, MINIMUM_DEPOSIT_USD, currency);
   const deposit = Math.min(total, Math.max(minDeposit, input.depositAmount));
   const balance = Math.max(0, total - deposit);
 
@@ -266,7 +292,7 @@ export function calculateDoujinPrice(input: CalculatorInput, lang: PriceLanguage
     sourceFileFee: 0, riggingFee: 0, extraPartsFee: 0, flatFees,
     total, low, high, deposit, balance, breakdown,
     labels: {
-      workType: doujinWorkType.label,
+      workType: labelFor(doujinWorkType, lang),
       colorMode: 'B/W', // Cover color mode is included in the brief separately
       complexity: coverResult ? coverResult.labels.complexity : '-',
       background: coverResult ? coverResult.labels.background : '-',

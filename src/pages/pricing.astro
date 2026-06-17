@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RATE, LIVE2D_RATE, COMMERCIAL_MULTIPLIER, SOURCE_FILE_PRICE, RIGGING_BASE_PRICE, EXTRA_PARTS_PRICE, MINIMUM_DEPOSIT } from '../data/pricing';
+import { workTypes, complexityOptions, backgroundOptions, rushOptions, ADULT_RATE, LIVE2D_RATE, COMMERCIAL_MULTIPLIER, SOURCE_FILE_PRICE, SOURCE_FILE_PRICE_USD, RIGGING_BASE_PRICE, RIGGING_BASE_PRICE_USD, EXTRA_PARTS_PRICE, EXTRA_PARTS_PRICE_USD, MINIMUM_DEPOSIT, MINIMUM_DEPOSIT_USD, DOUJIN_PAGE_PRICE_THB, DOUJIN_PAGE_PRICE_USD } from '../data/pricing';
 import { formatMoney } from '../lib/formatMoney';
 ---
 
@@ -38,10 +38,21 @@ import { formatMoney } from '../lib/formatMoney';
                   <div class="text-xs text-muted" data-i18n={`pricing.wt.${wt.id}.th`}>{wt.labelTh}</div>
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-ink">
-                  {wt.id === 'doujin' ? <span data-i18n="pricing.doujin.pages">450 THB / หน้า (ขาวดำ)</span> : (wt.bw !== null ? <span data-money-thb={wt.bw}>{formatMoney(wt.bw)}</span> : '—')}
+                  {wt.id === 'doujin' ? (
+                    <span
+                      data-money-thb={DOUJIN_PAGE_PRICE_THB}
+                      data-money-usd={DOUJIN_PAGE_PRICE_USD}
+                      data-money-suffix-th="/หน้า (ขาวดำ)"
+                      data-money-suffix-en="/page (B/W)"
+                    >
+                      {formatMoney(DOUJIN_PAGE_PRICE_THB, 'THB')}/หน้า (ขาวดำ)
+                    </span>
+                  ) : (wt.bw !== null ? <span data-money-thb={wt.bw} data-money-usd={wt.bwUsd}>{formatMoney(wt.bw, 'THB')}</span> : '—')}
                 </td>
                 <td class="px-5 py-3 text-right font-semibold text-primary">
-                  {wt.id === 'doujin' ? <span data-i18n="pricing.doujin.cover">ตามสเกลหน้าปก</span> : <span data-money-thb={wt.color}>{formatMoney(wt.color)}</span>}
+                  {wt.id === 'doujin'
+                    ? <span data-i18n="pricing.doujin.cover">ตามสเกลหน้าปก</span>
+                    : (wt.color !== null ? <span data-money-thb={wt.color} data-money-usd={wt.colorUsd}>{formatMoney(wt.color, 'THB')}</span> : '—')}
                 </td>
                 <td class="px-5 py-3 text-right text-muted">
                   {wt.estimatedDays[0]}–{wt.estimatedDays[1]}
@@ -62,7 +73,7 @@ import { formatMoney } from '../lib/formatMoney';
           {complexityOptions.map((opt) => (
             <li class="flex justify-between text-sm">
               <span class="text-muted" data-i18n={`pricing.complexity.${opt.id}`}>{opt.labelTh}</span>
-              <span class="font-semibold text-ink">{opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}</span>
+              <span class="font-semibold text-ink">{opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-usd={opt.surchargeUsd} data-money-prefix="+">{`+${formatMoney(opt.surcharge, 'THB')}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}</span>
             </li>
           ))}
         </ul>
@@ -76,7 +87,7 @@ import { formatMoney } from '../lib/formatMoney';
             <li class="flex justify-between text-sm">
               <span class="text-muted" data-i18n={`pricing.bg.${opt.id}`}>{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
+                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-usd={opt.surchargeUsd} data-money-prefix="+">{`+${formatMoney(opt.surcharge, 'THB')}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
               </span>
             </li>
           ))}
@@ -91,7 +102,7 @@ import { formatMoney } from '../lib/formatMoney';
             <li class="flex justify-between text-sm">
               <span class="text-muted" data-i18n={`pricing.rush.${opt.id}`}>{opt.labelTh}</span>
               <span class="font-semibold text-ink">
-                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-prefix="+">{`+${formatMoney(opt.surcharge)}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
+                {opt.surcharge === null ? <span data-i18n="pricing.notaccept">ไม่รับ</span> : opt.surcharge > 0 ? <span data-money-thb={opt.surcharge} data-money-usd={opt.surchargeUsd} data-money-prefix="+">{`+${formatMoney(opt.surcharge, 'THB')}`}</span> : <span data-i18n="pricing.nocharge">ไม่คิดเพิ่ม</span>}
               </span>
             </li>
           ))}
@@ -123,15 +134,15 @@ import { formatMoney } from '../lib/formatMoney';
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
             <span class="text-muted" data-i18n="pricing.extras.psd">ไฟล์ PSD (Vtuber)</span>
-            <span class="font-semibold text-ink" data-money-thb={SOURCE_FILE_PRICE}>{formatMoney(SOURCE_FILE_PRICE)}</span>
+            <span class="font-semibold text-ink" data-money-thb={SOURCE_FILE_PRICE} data-money-usd={SOURCE_FILE_PRICE_USD}>{formatMoney(SOURCE_FILE_PRICE, 'THB')}</span>
           </li>
           <li class="flex justify-between text-sm">
             <span class="text-muted" data-i18n="calc.addons.rigging">Rigging</span>
-            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={RIGGING_BASE_PRICE}>{formatMoney(RIGGING_BASE_PRICE)}</span></span>
+            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={RIGGING_BASE_PRICE} data-money-usd={RIGGING_BASE_PRICE_USD}>{formatMoney(RIGGING_BASE_PRICE, 'THB')}</span></span>
           </li>
           <li class="flex justify-between text-sm">
             <span class="text-muted" data-i18n="pricing.extras.parts">ชิ้นส่วนเพิ่ม</span>
-            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={EXTRA_PARTS_PRICE} data-money-suffix-th="/ชิ้น" data-money-suffix-en="/part">{formatMoney(EXTRA_PARTS_PRICE)}/ชิ้น</span></span>
+            <span class="font-semibold text-ink"><span data-i18n="pricing.startat">เริ่มที่</span> <span data-money-thb={EXTRA_PARTS_PRICE} data-money-usd={EXTRA_PARTS_PRICE_USD} data-money-suffix-th="/ชิ้น" data-money-suffix-en="/part">{formatMoney(EXTRA_PARTS_PRICE, 'THB')}/ชิ้น</span></span>
           </li>
         </ul>
       </div>
@@ -142,7 +153,7 @@ import { formatMoney } from '../lib/formatMoney';
         <ul class="space-y-2">
           <li class="flex justify-between text-sm">
             <span class="text-muted" data-i18n="pricing.payment.deposit">มัดจำขั้นต่ำ</span>
-            <span class="font-semibold text-ink" data-money-thb={MINIMUM_DEPOSIT}>{formatMoney(MINIMUM_DEPOSIT)}</span>
+            <span class="font-semibold text-ink" data-money-thb={MINIMUM_DEPOSIT} data-money-usd={MINIMUM_DEPOSIT_USD}>{formatMoney(MINIMUM_DEPOSIT, 'THB')}</span>
           </li>
           <li class="text-sm text-muted" data-i18n="pricing.payment.installments">ผ่อนได้สูงสุด 3 งวด</li>
           <li class="text-sm text-muted" data-i18n="pricing.payment.methods">รับชำระผ่าน Stripe, Wise, Ko-fi</li>
@@ -166,23 +177,31 @@ import { formatMoney } from '../lib/formatMoney';
 </BaseLayout>
 
 <script>
-  import { formatMoney, type MoneyLanguage } from '../lib/formatMoney';
+  import { formatMoney } from '../lib/formatMoney';
+  import { currencyForLanguage, type Currency, type PricingLanguage } from '../lib/currency';
 
-  function getMoneyLanguage(): MoneyLanguage {
+  function getPricingLanguage(): PricingLanguage {
     return localStorage.getItem('gosofia-lang') === 'en' || document.documentElement.lang === 'en'
       ? 'en'
       : 'th';
   }
 
+  function getPricingCurrency(): Currency {
+    return currencyForLanguage(getPricingLanguage());
+  }
+
   function renderPricingMoney() {
-    const lang = getMoneyLanguage();
+    const currency = getPricingCurrency();
     document.querySelectorAll<HTMLElement>('[data-money-thb]').forEach((el) => {
-      const amount = Number(el.dataset.moneyThb) || 0;
+      const rawAmount = currency === 'USD' ? el.dataset.moneyUsd : el.dataset.moneyThb;
+      const amount = Number(rawAmount);
+      if (!Number.isFinite(amount)) return;
+
       const prefix = el.dataset.moneyPrefix || '';
-      const suffix = lang === 'en'
+      const suffix = currency === 'USD'
         ? (el.dataset.moneySuffixEn || '')
         : (el.dataset.moneySuffixTh || '');
-      el.textContent = `${prefix}${formatMoney(amount, lang)}${suffix}`;
+      el.textContent = `${prefix}${formatMoney(amount, currency)}${suffix}`;
     });
   }
 

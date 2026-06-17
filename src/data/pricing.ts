@@ -11,9 +11,9 @@ export interface WorkTypeConfig {
   /** Base price for B/W, null if not available */
   bw: number | null;
   bwUsd: number | null;
-  /** Base price for Full Color */
-  color: number;
-  colorUsd: number;
+  /** Base price for Full Color, null if not available */
+  color: number | null;
+  colorUsd: number | null;
   /** Whether color mode is selectable (false = full color only) */
   hasColorChoice: boolean;
   /** Whether adult-category option is available for this type */
@@ -101,8 +101,8 @@ export const workTypes: WorkTypeConfig[] = [
     labelTh: 'รับวาดโดจิน',
     bw: null,
     bwUsd: null,
-    color: null as any,
-    colorUsd: null as any,
+    color: null,
+    colorUsd: null,
     hasColorChoice: false,
     adultAvailable: true,
     estimatedDays: [15, 45],
@@ -173,7 +173,7 @@ export const COMMERCIAL_MULTIPLIER = 2;
 
 /** Doujin page price */
 export const DOUJIN_PAGE_PRICE_THB = 450;
-export const DOUJIN_PAGE_PRICE_USD = 15;
+export const DOUJIN_PAGE_PRICE_USD = 14;
 
 /** Source file / PSD — only available for Vtuber model */
 export const SOURCE_FILE_PRICE = 4000;
